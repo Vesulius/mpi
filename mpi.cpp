@@ -22,7 +22,7 @@ enum Token { endfile,
              read,
              print };
 
-std::string tokenStringsMappings[19] = {"endfile",
+std::string tokenStringMappings[19] = {"endfile",
                                         "sum",
                                         "subtr",
                                         "multi",
@@ -172,10 +172,10 @@ void scanner() {
         }
         sourceFile.close();
     } else {
-        std::cout << "Unable to open file";
+        std::cout << "Error: Unable to open source file";
     }
     for (std::pair i : tokens)
-        std::cout << tokenStringsMappings[i.first] << ' ';
+        std::cout << tokenStringMappings[i.first] << ' ';
 }
 
 int main(int argc, char** argv) {
