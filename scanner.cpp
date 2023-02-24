@@ -86,7 +86,6 @@ void scanner(std::string sourceFilePath, std::vector<std::pair<Token, std::strin
                 } else {
                     tokens.push_back({string_val, stringBuild});
                 }
-                break;
             }
             if (std::isdigit(c)) {
                 std::string numberBuild = "";
@@ -112,11 +111,11 @@ void scanner(std::string sourceFilePath, std::vector<std::pair<Token, std::strin
                         varBuild = "";
                     }
                     if (varBuild == "int") {
-                        tokens.push_back({int_type, ""});
+                        tokens.push_back({type, "integer"});
                         varBuild = "";
                     }
                     if (varBuild == "string") {
-                        tokens.push_back({string_type, ""});
+                        tokens.push_back({type, "string"});
                         varBuild = "";
                     }
                     if (varBuild == "read") {

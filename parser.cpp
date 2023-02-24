@@ -10,60 +10,80 @@ int i = 0;
 
 void match(Token expected);
 void program();
+void statementList();
 void factor();
 void nextToken();
 void expression();
 void printError();
 
-void program() {
-    if (current != endfile) {
-        expression();
+// void statementList() {
+//     switch (current) {
+//         case id:
+//         case number_val:
+
+//             break;
+//         case endfile:
+//             return;
+//         default:
+//             printError();
+//     }
+// }
+
+void assignValue() {
+    switch (current) {
+        case assign:
+            match(assign);
+            expression();
+            break;
+        case endline:
+            break;
+        default:
+            printError();
+            break;
     }
+}
+
+void statement() {
+    switch (current) {
+        case declare_var:
+            match(declare_var);
+            match(id);
+            match(declare_type);
+            match(type);
+            assignValue();
+            match(endline);
+            break;
+        case id:
+            match(id);
+            assignValue();
+            match(endline);
+            break;
+        case endfile:
+            match(endfile);
+            break;
+        default:
+            printError();
+            break;
+    }
+}
+
+void program() {
+    statement();
     match(endfile);
 }
 
 void expression() {
-    factor();
     switch (current) {
-        case subtr:
-            match(subtr);
-            expression();
-            break;
-        case sum:
-            match(sum);
-            expression();
-            break;
-        case endline:
-            match(endline);
-            break;
-        default:
-            printError();
-            break;
-    }
-}
-
-void factor() {
-    switch (current) {
-        case id:
-            match(id);
-            break;
         case number_val:
             match(number_val);
             break;
+        case string_val:
+            match(string_val);
+            break;
         default:
             printError();
             break;
     }
-}
-
-void match2(Token expected1, Token expected2) {
-    if (current != expected1 || current != expected2) {
-        std::cout << "Parsing error: unexpected token: "
-                  << tokenStringMappings[current] << ". Expected: "
-                  << tokenStringMappings[expected1] << " or "
-                  << tokenStringMappings[expected2] << std::endl;
-    }
-    nextToken();
 }
 
 void match(Token expected) {

@@ -17,8 +17,7 @@ enum Token { endfile,
              declare_var,
              if_stmt,
              while_stmt,
-             int_type,
-             string_type,
+             type,
              read,
              print };
 
@@ -38,8 +37,7 @@ const std::string tokenStringMappings[20] = {"endfile",
                                              "declare_var",
                                              "if_stmt",
                                              "while_stmt",
-                                             "int_type",
-                                             "string_type",
+                                             "type",
                                              "read",
                                              "print"};
 
