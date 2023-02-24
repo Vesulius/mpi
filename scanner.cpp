@@ -2,58 +2,22 @@
 #include <iostream>
 #include <vector>
 
-enum Token { endfile,
-             sum,
-             subtr,
-             multi,
-             division,
-             lbracet,
-             rbracet,
-             declare_type,
-             assign,
-             number_val,
-             string_val,
-             var_val,
-             declare_var,
-             if_stmt,
-             while_stmt,
-             int_type,
-             string_type,
-             read,
-             print };
+#include "header.h"
 
-std::string tokenStringMappings[19] = {"endfile",
-                                        "sum",
-                                        "subtr",
-                                        "multi",
-                                        "division",
-                                        "lbracet",
-                                        "rbracet",
-                                        "declare_type",
-                                        "assign",
-                                        "number_val",
-                                        "string_val",
-                                        "var_val",
-                                        "declare_var",
-                                        "if_stmt",
-                                        "while_stmt",
-                                        "int_type",
-                                        "string_type",
-                                        "read",
-                                        "print"};
-
-std::vector<std::pair<Token, std::string>> tokens;
-std::string sourceFilePath;
-
-void scanner() {
+void scanner(std::string sourceFilePath, std::vector<std::pair<Token, std::string>> &tokens) {
     std::ifstream sourceFile(sourceFilePath);
     char c;
+    bool charsLeft = true;
     if (sourceFile.is_open()) {
-        while (sourceFile.good()) {
+        while (charsLeft) {
             c = sourceFile.get();
             switch (c) {
                 case EOF:
                     tokens.push_back({endfile, ""});
+                    charsLeft = false;
+                    break;
+                case ';':
+                    tokens.push_back({endline, ""});
                     break;
                 case '+':
                     tokens.push_back({sum, ""});
@@ -165,7 +129,7 @@ void scanner() {
                     }
                 }
                 if (varBuild != "") {
-                    tokens.push_back({var_val, varBuild});
+                    tokens.push_back({id, varBuild});
                 }
                 sourceFile.unget();
             }
@@ -174,18 +138,4 @@ void scanner() {
     } else {
         std::cout << "Error: Unable to open source file";
     }
-    for (std::pair i : tokens)
-        std::cout << tokenStringMappings[i.first] << ' ';
-}
-
-int main(int argc, char** argv) {
-    if (argc > 1) {
-        sourceFilePath = argv[1];
-    } else {
-        sourceFilePath = "test.mp";
-    }
-
-    scanner();
-
-    return 0;
 }
