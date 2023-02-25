@@ -84,7 +84,7 @@ void scanner(std::string sourceFilePath, std::vector<std::pair<Token, std::strin
                 if (c == EOF) {
                     std::cout << "Syntax error: string missing closing quotation mark" << std::endl;
                 } else {
-                    tokens.push_back({string_val, stringBuild});
+                    tokens.push_back({literal, stringBuild});
                 }
             }
             if (std::isdigit(c)) {
@@ -94,7 +94,7 @@ void scanner(std::string sourceFilePath, std::vector<std::pair<Token, std::strin
                     numberBuild += c;
                     c = sourceFile.get();
                 }
-                tokens.push_back({number_val, numberBuild});
+                tokens.push_back({literal, numberBuild});
                 sourceFile.unget();
             }
             if (std::isalpha(c)) {
