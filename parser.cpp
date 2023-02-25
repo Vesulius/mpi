@@ -10,24 +10,22 @@ int i = 0;
 
 void match(Token expected);
 void program();
+void statement();
 void statementList();
 void factor();
 void nextToken();
 void expression();
 void printError();
 
-// void statementList() {
-//     switch (current) {
-//         case id:
-//         case number_val:
-
-//             break;
-//         case endfile:
-//             return;
-//         default:
-//             printError();
-//     }
-// }
+void statementList() {
+    switch (current) {
+        case endfile:
+            return;
+        default:
+            statement();
+            statementList();
+    }
+}
 
 void assignValue() {
     switch (current) {
@@ -68,7 +66,7 @@ void statement() {
 }
 
 void program() {
-    statement();
+    statementList();
     match(endfile);
 }
 
