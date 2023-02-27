@@ -8,126 +8,123 @@ std::vector<std::pair<Token, std::string>> tokens2;
 std::pair<Token, std::string> current;
 int i = 0;
 
-struct node {};
-
-struct error_node : node {};
-
-struct null_node : node {};
-
-struct literal_node : node {
+struct literal_node {
     std::string value;
 };
 
-struct assign_node : node {
+struct expression_node {
+    literal_node* literal;
+};
+
+struct assign_node {
     std::string id;
-    node child;
+    expression_node* expression;
 };
 
-struct exspression_node : node {
-    node child;
+struct statement_node {
+    assign_node* assignment;
 };
 
-struct statement_node : node {
-    node child;
+struct statement_list_node {
+    statement_node* statement;
+    statement_list_node* statementList;
 };
 
-struct statement_list_node : node {
-    node statement;
-    node statementList;
+struct program_node {
+    statement_list_node* statementList;
 };
 
-struct program_node : node {
-    node child;
-};
+program_node* program();
+statement_node* statement();
+statement_list_node* statementList();
+expression_node* expression();
 
-node program();
-node statement();
-node statementList();
-node expression();
-
+std::string getNTabs(int);
 void match(Token expected);
 void nextToken();
 void printError();
 
-node expression() {
-    exspression_node node;
+expression_node* expression() {
+    expression_node* node = new expression_node();
     switch (current.first) {
         case literal: {
             match(literal);
-            literal_node literalNode;
-            literalNode.value = current.second;
-            node.child = literalNode;
+            literal_node* literalNode = new literal_node();
+            (*literalNode).value = current.second;
+            (*node).literal = literalNode;
             return node;
         }
         default:
             printError();
-            error_node errorNode;
-            return errorNode;
-    }
-}
-
-node assignValue(std::string varName) {
-    assign_node node;
-    switch (current.first) {
-        case assign:
-            match(assign);
-            node.id = varName;
-            node.child = expression();
             return node;
-        case endline:
-            null_node nullNode;
-            return nullNode;
-        default:
-            printError();
-            error_node errorNode;
-            return errorNode;
     }
 }
 
-node statement() {
-    statement_node node;
+assign_node* assignValue(std::string varName) {
+    assign_node* node = new assign_node();
+    switch (current.first) {
+        case assign: {
+            match(assign);
+            (*node).id = varName;
+            (*node).expression = expression();
+            return node;
+        }
+        case endline: {
+            return nullptr;
+        }
+        default: {
+            printError();
+            return node;
+        }
+    }
+}
+
+statement_node* statement() {
+    statement_node* node = new statement_node();
     switch (current.first) {
         case declare_var: {
             match(declare_var);
             match(id);
             match(declare_type);
             match(type);
-            node.child = assignValue(current.second);
+            (*node).assignment = assignValue(current.second);
             match(endline);
             return node;
         }
-        case id:
+        case id: {
             match(id);
-            node.child = assignValue(current.second);
+            (*node).assignment = assignValue(current.second);
             match(endline);
             return node;
-        case endfile:
+        }
+        case endfile: {
             match(endfile);
-            null_node nullNode;
-            return nullNode;
-        default:
+            return nullptr;
+        }
+        default: {
             printError();
-            error_node errorNode;
-            return errorNode;
-    }
-}
-
-node statementList() {
-    statement_list_node node;
-    switch (current.first) {
-        case endfile:
-            null_node nullNode;
-            return nullNode;
-        default:
-            node.statement = statement();
-            node.statementList = statementList();
             return node;
+        }
     }
 }
 
-node program() {
-    program_node node;
-    node.child = statementList();
+statement_list_node* statementList() {
+    statement_list_node* node = new statement_list_node();
+    switch (current.first) {
+        case endfile: {
+            return nullptr;
+        }
+        default: {
+            (*node).statement = statement();
+            (*node).statementList = statementList();
+            return node;
+        }
+    }
+}
+
+program_node* program() {
+    program_node* node = new program_node();
+    (*node).statementList = statementList();
     match(endfile);
     return node;
 }
@@ -152,9 +149,54 @@ void nextToken() {
     i++;
 }
 
+void printVisitor(literal_node* n, int tablevel) {
+    if (n == nullptr) return;
+    std::cout << getNTabs(tablevel) << "literal node" << std::endl;
+}
+
+void printVisitor(expression_node* n, int tablevel) {
+    if (n == nullptr) return;
+    std::cout << getNTabs(tablevel) << "expression node" << std::endl;
+    printVisitor((*n).literal, tablevel + 1);
+}
+
+void printVisitor(assign_node* n, int tablevel) {
+    if (n == nullptr) return;
+    std::cout << getNTabs(tablevel) << "assign node" << std::endl;
+    printVisitor((*n).expression, tablevel + 1);
+}
+
+void printVisitor(statement_node* n, int tablevel) {
+    if (n == nullptr) return;
+    std::cout << getNTabs(tablevel) << "statement node" << std::endl;
+    printVisitor((*n).assignment, tablevel + 1);
+}
+
+void printVisitor(statement_list_node* n, int tablevel) {
+    if (n == nullptr) return;
+    std::cout << getNTabs(tablevel) << "statement list node" << std::endl;
+    printVisitor((*n).statement, tablevel + 1);
+    printVisitor((*n).statementList, tablevel + 1);
+}
+
+void printVisitor(program_node* n, int tablevel) {
+    if (n == nullptr) return;
+    std::cout << getNTabs(tablevel) << "program node" << std::endl;
+    printVisitor((*n).statementList, tablevel + 1);
+}
+
+std::string getNTabs(int n) {
+    std::string tabs = "";
+    for (int i = 0; i < n; i++) {
+        tabs += '\t';
+    }
+    return tabs;
+}
+
 void parser(std::vector<std::pair<Token, std::string>>& tokens) {
     tokens2 = tokens;
     std::cout << "Number of tokens " << tokens.size() << std::endl;
     nextToken();
-    node programNode = program();
+    program_node* programNode = program();
+    printVisitor(programNode, 0);
 }
