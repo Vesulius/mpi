@@ -1,4 +1,3 @@
-#include <fstream>
 #include <iostream>
 #include <vector>
 
@@ -8,80 +7,14 @@ std::vector<std::pair<Token, std::string>> tokens2;
 std::pair<Token, std::string> current;
 int i = 0;
 
-struct id_node {
-    std::string value;
-};
-
-struct literal_node {
-    std::string value;
-};
-
-struct add_node {
-    std::string op;
-};
-
-struct multi_node {
-    std::string op;
-};
-
-struct factor_node {
-    literal_node* literal;
-    id_node* id;
-};
-
-struct factor_tail_node {
-    multi_node* multi;
-    factor_node* factor;
-    factor_tail_node* factorTail;
-};
-
-struct term_node {
-    factor_node* factor;
-    factor_tail_node* factorTail;
-};
-
-struct term_tail_node {
-    add_node* add;
-    term_node* term;
-    term_tail_node* termTail;
-};
-
-struct expression_node {
-    // literal_node* literal;
-    term_node* term;
-    term_tail_node* termTail;
-};
-
-struct assign_node {
-    std::string id;
-    expression_node* expression;
-};
-
-struct statement_node {
-    id_node* id;
-    assign_node* assignment;
-};
-
-struct statement_list_node {
-    statement_node* statement;
-    statement_list_node* statementList;
-};
-
-struct program_node {
-    statement_list_node* statementList;
-};
-
 program_node* program();
 statement_node* statement();
 statement_list_node* statementList();
 expression_node* expression();
 
-std::string getNTabs(int);
 void match(Token expected);
 void nextToken();
 void printError();
-
-
 
 literal_node* literalVal() {
     literal_node* node = new literal_node();
@@ -270,101 +203,10 @@ void nextToken() {
     i++;
 }
 
-void printVisitor(literal_node* n, int tablevel) {
-    if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "literal: " << n->value << std::endl;
-}
-
-void printVisitor(multi_node* n, int tablevel) {
-    if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "multi: " << n->op << std::endl;
-}
-
-void printVisitor(add_node* n, int tablevel) {
-    if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "add: " << n->op << std::endl;
-}
-
-void printVisitor(id_node* n, int tablevel) {
-    if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "id" << std::endl;
-}
-
-void printVisitor(factor_node* n, int tablevel) {
-    if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "factor" << std::endl;
-    printVisitor(n->id, tablevel + 1);
-    printVisitor(n->literal, tablevel + 1);
-}
-
-void printVisitor(factor_tail_node* n, int tablevel) {
-    if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "factor tail" << std::endl;
-    printVisitor(n->multi, tablevel + 1);
-    printVisitor(n->factor, tablevel + 1);
-    printVisitor(n->factorTail, tablevel + 1);
-}
-
-void printVisitor(term_node* n, int tablevel) {
-    if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "term" << std::endl;
-    printVisitor(n->factor, tablevel + 1);
-    printVisitor(n->factorTail, tablevel + 1);
-}
-
-void printVisitor(term_tail_node* n, int tablevel) {
-    if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "term tail" << std::endl;
-    printVisitor(n->add, tablevel + 1);
-    printVisitor(n->term, tablevel + 1);
-    printVisitor(n->termTail, tablevel + 1);
-}
-
-void printVisitor(expression_node* n, int tablevel) {
-    if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "expression" << std::endl;
-    printVisitor(n->term, tablevel + 1);
-    printVisitor(n->termTail, tablevel + 1);
-}
-
-void printVisitor(assign_node* n, int tablevel) {
-    if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "assign" << std::endl;
-    printVisitor(n->expression, tablevel + 1);
-}
-
-void printVisitor(statement_node* n, int tablevel) {
-    if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "statement" << std::endl;
-    printVisitor(n->assignment, tablevel + 1);
-}
-
-void printVisitor(statement_list_node* n, int tablevel) {
-    if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "statement list" << std::endl;
-    printVisitor(n->statement, tablevel + 1);
-    printVisitor(n->statementList, tablevel + 1);
-}
-
-void printVisitor(program_node* n, int tablevel) {
-    if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "program" << std::endl;
-    printVisitor(n->statementList, tablevel + 1);
-}
-
-std::string getNTabs(int n) {
-    std::string tabs = "";
-    for (int i = 0; i < n; i++) {
-        tabs += "     ";
-    }
-    return tabs;
-}
-
-void parser(std::vector<std::pair<Token, std::string>>& tokens) {
+program_node* parser(std::vector<std::pair<Token, std::string>>& tokens) {
     tokens2 = tokens;
     std::cout << "Number of tokens " << tokens.size() << "\n"
               << std::endl;
     nextToken();
-    program_node* programNode = program();
-    printVisitor(programNode, 0);
+    return program();
 }

@@ -22,6 +22,7 @@ int main(int argc, char** argv) {
     std::cout << std::endl
               << std::endl;
 
-    parser(tokens);
+    program_node* programNode = parser(tokens);
+    printVisitor(programNode);
     return 0;
 }
