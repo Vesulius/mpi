@@ -20,13 +20,13 @@ void scanner(std::string sourceFilePath, std::vector<std::pair<Token, std::strin
                     tokens.push_back({endline, ""});
                     break;
                 case '+':
-                    tokens.push_back({sum, ""});
+                    tokens.push_back({add, "+"});
                     break;
                 case '-':
-                    tokens.push_back({subtr, ""});
+                    tokens.push_back({add, "-"});
                     break;
                 case '*':
-                    tokens.push_back({multi, ""});
+                    tokens.push_back({multi, "*"});
                     break;
                 case '(':
                     tokens.push_back({lbracet, ""});
@@ -70,7 +70,7 @@ void scanner(std::string sourceFilePath, std::vector<std::pair<Token, std::strin
                         break;
                     default:
                         sourceFile.unget();
-                        tokens.push_back({division, ""});
+                        tokens.push_back({multi, "/"});
                         break;
                 }
             }
