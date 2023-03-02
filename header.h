@@ -35,6 +35,8 @@ const std::string tokenStringMappings[19] = {"endfile",
                                              "read",
                                              "print"};
 
+struct expression_node;
+
 struct id_node {
     std::string value;
 };
@@ -54,6 +56,7 @@ struct multi_node {
 struct factor_node {
     literal_node* literal;
     id_node* id;
+    expression_node* expression;
 };
 
 struct factor_tail_node {

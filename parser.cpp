@@ -53,6 +53,11 @@ factor_node* factor() {
         case literal:
             node->literal = literalVal();
             return node;
+        case lbracet:
+            match(lbracet);
+            node->expression = expression();
+            match(rbracet);
+            return node;
         default:
             printError();
             return nullptr;
@@ -63,9 +68,9 @@ factor_tail_node* factorTail() {
     factor_tail_node* node = new factor_tail_node();
     switch (current.first) {
         case multi:
-            (*node).multi = multiVal();
-            (*node).factor = factor();
-            (*node).factorTail = factorTail();
+            node->multi = multiVal();
+            node->factor = factor();
+            node->factorTail = factorTail();
             return node;
         case endline:
         case endfile:
@@ -80,11 +85,10 @@ term_node* term() {
     switch (current.first) {
         case endfile:
             return nullptr;
-        default: {
-            (*node).factor = factor();
-            (*node).factorTail = factorTail();
+        default:
+            node->factor = factor();
+            node->factorTail = factorTail();
             return node;
-        }
     }
 }
 
@@ -92,9 +96,9 @@ term_tail_node* termTail() {
     term_tail_node* node = new term_tail_node();
     switch (current.first) {
         case add:
-            (*node).add = addVal();
-            (*node).term = term();
-            (*node).termTail = termTail();
+            node->add = addVal();
+            node->term = term();
+            node->termTail = termTail();
             return node;
         case endline:
         case endfile:
@@ -110,8 +114,8 @@ expression_node* expression() {
         case endfile:
             return nullptr;
         default: {
-            (*node).term = term();
-            (*node).termTail = termTail();
+            node->term = term();
+            node->termTail = termTail();
             return node;
         }
     }
@@ -122,7 +126,7 @@ assign_node* assignValue() {
     switch (current.first) {
         case assign:
             match(assign);
-            (*node).expression = expression();
+            node->expression = expression();
             return node;
         case endline:
             return nullptr;
@@ -135,49 +139,43 @@ assign_node* assignValue() {
 statement_node* statement() {
     statement_node* node = new statement_node();
     switch (current.first) {
-        case declare_var: {
+        case declare_var:
             match(declare_var);
             node->id = idVal();
             match(declare_type);
             match(type);
-            (*node).assignment = assignValue();
+            node->assignment = assignValue();
             match(endline);
             return node;
-        }
-        case id: {
+        case id:
             node->id = idVal();
-            (*node).assignment = assignValue();
+            node->assignment = assignValue();
             match(endline);
             return node;
-        }
-        case endfile: {
+        case endfile:
             match(endfile);
             return nullptr;
-        }
-        default: {
+        default:
             printError();
             return node;
-        }
     }
 }
 
 statement_list_node* statementList() {
     statement_list_node* node = new statement_list_node();
     switch (current.first) {
-        case endfile: {
+        case endfile:
             return nullptr;
-        }
-        default: {
-            (*node).statement = statement();
-            (*node).statementList = statementList();
+        default:
+            node->statement = statement();
+            node->statementList = statementList();
             return node;
-        }
     }
 }
 
 program_node* program() {
     program_node* node = new program_node();
-    (*node).statementList = statementList();
+    node->statementList = statementList();
     match(endfile);
     return node;
 }
@@ -185,16 +183,17 @@ program_node* program() {
 void match(Token expected) {
     if (current.first != expected) {
         std::cout << "Parsing error: unexpected token: " << tokenStringMappings[current.first] << ". Expected: " << tokenStringMappings[expected] << std::endl;
+        current = {endfile, ""};
+        return;
     } else if (expected == endfile) {
-        std::cout << "IT WORKED!!" << std::endl;
         return;
     }
     nextToken();
 }
 
 void printError() {
-    current = {endfile, ""};
     std::cout << "Parsing error: unexpected token: " << tokenStringMappings[current.first] << std::endl;
+    current = {endfile, ""};
 }
 
 void nextToken() {

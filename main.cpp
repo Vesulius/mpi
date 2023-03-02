@@ -24,5 +24,6 @@ int main(int argc, char** argv) {
 
     program_node* programNode = parser(tokens);
     printVisitor(programNode);
+
     return 0;
 }

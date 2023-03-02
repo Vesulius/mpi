@@ -4,6 +4,8 @@
 
 std::string getNTabs(int);
 
+void printVisitor(expression_node*, int);
+
 void printVisitor(literal_node* n, int tablevel) {
     if (n == nullptr) return;
     std::cout << getNTabs(tablevel) << "literal: " << n->value << std::endl;
@@ -29,6 +31,7 @@ void printVisitor(factor_node* n, int tablevel) {
     std::cout << getNTabs(tablevel) << "factor" << std::endl;
     printVisitor(n->id, tablevel + 1);
     printVisitor(n->literal, tablevel + 1);
+    printVisitor(n->expression, tablevel + 1);
 }
 
 void printVisitor(factor_tail_node* n, int tablevel) {
@@ -87,7 +90,7 @@ void printVisitor(program_node* n, int tablevel) {
 }
 
 void printVisitor(program_node* n) {
-    std::cout << "ABSTRACT SYNTAX TREE:" << std::endl;
+    std::cout << "\nABSTRACT SYNTAX TREE:\n" << std::endl;
     printVisitor(n, 0);
 }
 
