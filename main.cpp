@@ -14,15 +14,15 @@ int main(int argc, char** argv) {
         sourceFilePath = "test.mp";
     }
 
-    scanner(sourceFilePath, tokens);
+    Scanner* scann = new Scanner(sourceFilePath);
+    // Token t = scann->nextToken();
 
-    for (std::pair i : tokens) {
-        std::cout << tokenStringMappings[i.first] << ' ';
-    }
-    std::cout << std::endl
-              << std::endl;
+    // while (t != endfile) {
+    //     std::cout << tokenStringMappings[t] << " " << std::endl;
+    //     t = scann->nextToken();
+    // }
 
-    program_node* programNode = parser(tokens);
+    program_node* programNode = parser(scann);
     printVisitor(programNode);
 
     return 0;

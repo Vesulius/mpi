@@ -1,4 +1,6 @@
+#include <fstream>
 #include <string>
+#include <variant>
 #include <vector>
 
 enum Token { endfile,
@@ -35,6 +37,32 @@ const std::string tokenStringMappings[19] = {"endfile",
                                              "read",
                                              "print"};
 
+enum Type {
+    type_string,
+    type_int,
+    type_bool
+};
+
+const std::string typeStringMappings[3] = {
+    "type_string",
+    "type_int",
+    "type_bool"
+};
+
+enum Operator {
+    sum,
+    subraction,
+    multiplication,
+    division
+};
+
+const std::string operatorStringMappings[4] = {
+    "sum",
+    "subraction",
+    "multiplication",
+    "division"
+};
+
 struct expression_node;
 
 struct id_node {
@@ -42,15 +70,16 @@ struct id_node {
 };
 
 struct literal_node {
-    std::string value;
+    Type type;
+    std::variant<std::string, int, bool> value;
 };
 
 struct add_node {
-    std::string op;
+    Operator op;
 };
 
 struct multi_node {
-    std::string op;
+    Operator op;
 };
 
 struct factor_node {
@@ -100,6 +129,20 @@ struct program_node {
     statement_list_node* statementList;
 };
 
+class Scanner {
+    char c;
+    std::ifstream sourceFile;
+    int row;
+    int column;
+    std::variant<std::string, int, Type, Operator> data;
+    Token current;
+
+   public:
+    Scanner(std::string);
+    Token nextToken();
+    std::string getLocation();
+    std::variant<std::string, int, Type, Operator> getData();
+};
+
 void printVisitor(program_node*);
-void scanner(std::string, std::vector<std::pair<Token, std::string>>&);
-program_node* parser(std::vector<std::pair<Token, std::string>>&);
+program_node* parser(Scanner*);

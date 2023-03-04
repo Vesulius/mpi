@@ -8,17 +8,23 @@ void printVisitor(expression_node*, int);
 
 void printVisitor(literal_node* n, int tablevel) {
     if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "literal: " << n->value << std::endl;
+    if (n->type == type_string) {
+        std::cout << getNTabs(tablevel) << "literal: " << std::get<std::string>(n->value) << std::endl;
+    } else if (n->type == type_bool) {
+        std::cout << getNTabs(tablevel) << "literal: " << std::get<bool>(n->value) << std::endl;
+    } else {
+        std::cout << getNTabs(tablevel) << "literal: " << std::get<int>(n->value) << std::endl;
+    }
 }
 
 void printVisitor(multi_node* n, int tablevel) {
     if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "multi: " << n->op << std::endl;
+    std::cout << getNTabs(tablevel) << "multi: " << operatorStringMappings[n->op] << std::endl;
 }
 
 void printVisitor(add_node* n, int tablevel) {
     if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "add: " << n->op << std::endl;
+    std::cout << getNTabs(tablevel) << "add: " << operatorStringMappings[n->op] << std::endl;
 }
 
 void printVisitor(id_node* n, int tablevel) {
@@ -90,7 +96,8 @@ void printVisitor(program_node* n, int tablevel) {
 }
 
 void printVisitor(program_node* n) {
-    std::cout << "\nABSTRACT SYNTAX TREE:\n" << std::endl;
+    std::cout << "\nABSTRACT SYNTAX TREE:\n"
+              << std::endl;
     printVisitor(n, 0);
 }
 

@@ -1,140 +1,155 @@
 #include <fstream>
 #include <iostream>
+#include <variant>
 #include <vector>
 
 #include "header.h"
 
-void scanner(std::string sourceFilePath, std::vector<std::pair<Token, std::string>> &tokens) {
-    std::ifstream sourceFile(sourceFilePath);
-    char c;
-    bool charsLeft = true;
-    if (sourceFile.is_open()) {
-        while (charsLeft) {
+Scanner::Scanner(std::string sourceFilePath) {
+    sourceFile.open(sourceFilePath);
+    if (!sourceFile.is_open()) {
+        std::cout << "Error: Unable to open source file " << sourceFilePath << std::endl;
+    }
+    row = 0;
+    column = 0;
+}
+
+Token Scanner::nextToken() {
+    while (sourceFile.is_open()) {
+        c = sourceFile.get();
+        column++;
+        switch (c) {
+            case EOF:
+                sourceFile.close();
+                return endfile;
+            case ';':
+                return endline;
+            case '+':
+                data = sum;
+                return add;
+            case '-':
+                data = subraction;
+                return add;
+            case '*':
+                data = multiplication;
+                return multi;
+            case '(':
+                return lbracet;
+            case ')':
+                return rbracet;
+            case ':':
+                c = sourceFile.get();
+                if (c == '=') {
+                    return assign;
+                } else {
+                    sourceFile.unget();
+                    return declare_type;
+                }
+            case '\n':
+                column = 0;
+                row++;
+                break;
+        }
+        if (c == '/') {
             c = sourceFile.get();
             switch (c) {
-                case EOF:
-                    tokens.push_back({endfile, ""});
-                    charsLeft = false;
-                    break;
-                case ';':
-                    tokens.push_back({endline, ""});
-                    break;
-                case '+':
-                    tokens.push_back({add, "+"});
-                    break;
-                case '-':
-                    tokens.push_back({add, "-"});
-                    break;
+                case '/':
+                    // single comment, skip rest of line
+                    do {
+                        c = sourceFile.get();
+                        break;
+                    } while (c != '\n' || c != EOF);
                 case '*':
-                    tokens.push_back({multi, "*"});
-                    break;
-                case '(':
-                    tokens.push_back({lbracet, ""});
-                    break;
-                case ')':
-                    tokens.push_back({rbracet, ""});
-                    break;
-                case ':':
-                    c = sourceFile.get();
-                    if (c == '=') {
-                        tokens.push_back({assign, ""});
-                    } else {
-                        tokens.push_back({declare_type, ""});
-                        sourceFile.unget();
-                    }
-                    break;
-            }
-            if (c == '/') {
-                c = sourceFile.get();
-                switch (c) {
-                    case '/':
-                        // single comment, skip rest of line
-                        do {
+                    // multiline comment, skip until "*/"
+                    // DOES NOT WORK WITH NESTED MULTILINE COMMENTS
+                    while (true) {
+                        c = sourceFile.get();
+                        if (c == '*') {
                             c = sourceFile.get();
-                            break;
-                        } while (c != '\n' || c != EOF);
-                    case '*':
-                        // multiline comment, skip until "*/"
-                        // DOES NOT WORK WITH NESTED MULTILINE COMMENTS
-                        while (true) {
-                            c = sourceFile.get();
-                            if (c == '*') {
-                                c = sourceFile.get();
-                                if (c == '/') {
-                                    break;
-                                } else {
-                                    sourceFile.unget();
-                                }
+                            if (c == '/') {
+                                break;
+                            } else {
+                                sourceFile.unget();
                             }
                         }
-                        break;
-                    default:
-                        sourceFile.unget();
-                        tokens.push_back({multi, "/"});
-                        break;
-                }
-            }
-            if (c == '\"') {
-                std::string stringBuild = "";
-                c = sourceFile.get();
-                while (c != '\"' && c != EOF) {
-                    stringBuild += c;
-                    c = sourceFile.get();
-                }
-                if (c == EOF) {
-                    std::cout << "Syntax error: string missing closing quotation mark" << std::endl;
-                } else {
-                    tokens.push_back({literal, stringBuild});
-                }
-            }
-            if (std::isdigit(c)) {
-                std::string numberBuild = "";
-                while (std::isdigit(c)) {
-                    // number, DOES NOT RECOGNIZE FLOATS
-                    numberBuild += c;
-                    c = sourceFile.get();
-                }
-                tokens.push_back({literal, numberBuild});
-                sourceFile.unget();
-            }
-            if (std::isalpha(c)) {
-                std::string varBuild = "";
-                while (std::isalpha(c)) {
-                    varBuild += c;
-                    c = sourceFile.get();
-                    if (varBuild == "var") {
-                        tokens.push_back({declare_var, ""});
-                        varBuild = "";
                     }
-                    if (varBuild == "if") {
-                        tokens.push_back({if_stmt, ""});
-                        varBuild = "";
-                    }
-                    if (varBuild == "int") {
-                        tokens.push_back({type, "integer"});
-                        varBuild = "";
-                    }
-                    if (varBuild == "string") {
-                        tokens.push_back({type, "string"});
-                        varBuild = "";
-                    }
-                    if (varBuild == "read") {
-                        tokens.push_back({read, ""});
-                        varBuild = "";
-                    }
-                    if (varBuild == "print") {
-                        tokens.push_back({print, ""});
-                        varBuild = "";
-                    }
-                }
-                if (varBuild != "") {
-                    tokens.push_back({id, varBuild});
-                }
-                sourceFile.unget();
+                    break;
+                default:
+                    sourceFile.unget();
+                    data = division;
+                    return multi;
             }
         }
-        sourceFile.close();
-    } else {
-        std::cout << "Error: Unable to open source file";
+        if (c == '\"') {
+            std::string stringBuild = "";
+            c = sourceFile.get();
+            while (c != '\"' && c != EOF) {
+                stringBuild += c;
+                c = sourceFile.get();
+            }
+            if (c == EOF) {
+                std::cout << "Syntax error at" << getLocation() << ": string missing closing quotation mark" << std::endl;
+            } else {
+                data = stringBuild;
+                return literal;
+            }
+        }
+        if (std::isdigit(c)) {
+            std::string numberBuild = "";
+            while (std::isdigit(c)) {
+                // number, DOES NOT RECOGNIZE FLOATS
+                numberBuild += c;
+                c = sourceFile.get();
+            }
+            data = std::stoi(numberBuild);
+            sourceFile.unget();
+            return literal;
+        }
+        if (std::isalpha(c)) {
+            std::string varBuild = "";
+            while (std::isalpha(c)) {
+                varBuild += c;
+                c = sourceFile.get();
+                if (varBuild == "var") {
+                    return declare_var;
+                }
+                if (varBuild == "if") {
+                    return if_stmt;
+                }
+                if (varBuild == "int") {
+                    data = type_int;
+                    return type;
+                }
+                if (varBuild == "string") {
+                    data = type_string;
+                    return type;
+                }
+                if (varBuild == "read") {
+                    return read;
+                }
+                if (varBuild == "print") {
+                    return print;
+                }
+            }
+            if (varBuild != "") {
+                data = varBuild;
+                return id;
+            }
+            sourceFile.unget();
+        }
     }
+    std::cout << "Syntax error at" << getLocation() << ": bad token match" << std::endl;
+    return endfile;
 }
+
+std::string Scanner::getLocation() {
+    std::string s = "column: ";
+    s += std::to_string(column);
+    s += " row: ";
+    s += std::to_string(row);
+    return s;
+}
+
+std::variant<std::string, int, Type, Operator> Scanner::getData() {
+    return data;
+};
