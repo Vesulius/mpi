@@ -115,9 +115,19 @@ struct assign_node {
     expression_node* expression;
 };
 
+struct print_node {
+    expression_node* expression;
+};
+
+struct read_node {
+    id_node* id;
+};
+
 struct statement_node {
     id_node* id;
     assign_node* assignment;
+    print_node* print;
+    read_node* read;
 };
 
 struct statement_list_node {

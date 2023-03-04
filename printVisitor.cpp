@@ -29,7 +29,7 @@ void printVisitor(add_node* n, int tablevel) {
 
 void printVisitor(id_node* n, int tablevel) {
     if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "id" << std::endl;
+    std::cout << getNTabs(tablevel) << "id: " << n->value << std::endl;
 }
 
 void printVisitor(factor_node* n, int tablevel) {
@@ -70,6 +70,18 @@ void printVisitor(expression_node* n, int tablevel) {
     printVisitor(n->termTail, tablevel + 1);
 }
 
+void printVisitor(print_node* n, int tablevel) {
+    if (n == nullptr) return;
+    std::cout << getNTabs(tablevel) << "print" << std::endl;
+    printVisitor(n->expression, tablevel + 1);
+}
+
+void printVisitor(read_node* n, int tablevel) {
+    if (n == nullptr) return;
+    std::cout << getNTabs(tablevel) << "read: " << std::endl;
+    printVisitor(n->id, tablevel + 1);
+}
+
 void printVisitor(assign_node* n, int tablevel) {
     if (n == nullptr) return;
     std::cout << getNTabs(tablevel) << "assign" << std::endl;
@@ -80,6 +92,8 @@ void printVisitor(statement_node* n, int tablevel) {
     if (n == nullptr) return;
     std::cout << getNTabs(tablevel) << "statement" << std::endl;
     printVisitor(n->assignment, tablevel + 1);
+    printVisitor(n->print, tablevel + 1);
+    printVisitor(n->read, tablevel + 1);
 }
 
 void printVisitor(statement_list_node* n, int tablevel) {
