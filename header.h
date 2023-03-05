@@ -2,6 +2,7 @@
 #include <string>
 #include <variant>
 #include <vector>
+#include <map>
 
 enum Token { endfile,
              endline,
@@ -155,4 +156,5 @@ class Scanner {
 };
 
 void printVisitor(program_node*);
+void typeVisitor(program_node*);
 program_node* parser(Scanner*);

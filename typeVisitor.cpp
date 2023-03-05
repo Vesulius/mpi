@@ -1,103 +1,129 @@
-// #include <iostream>
+#include <iostream>
 
-// #include "header.h"
+#include "header.h"
 
-// std::string getNTabs(int);
+#define ANY
 
-// void typeVisitor(expression_node*, int);
+enum allTypes {
+    check_string,
+    check_int,
+    check_bool,
+    none
+};
 
-// void typeVisitor(literal_node* n, int tablevel) {
-//     if (n == nullptr) return;
-//     std::cout << getNTabs(tablevel) << "literal: " << n->value << std::endl;
-// }
+std::string allTypesStringMappings[4] = {
+    "string type",
+    "int type",
+    "bool type",
+    "none"};
 
-// void typeVisitor(multi_node* n, int tablevel) {
-//     if (n == nullptr) return;
-//     std::cout << getNTabs(tablevel) << "multi: " << n->op << std::endl;
-// }
+allTypes
+checkType(allTypes t1, allTypes t2) {
+    if (t1 == none && t2 != none) {
+        return t2;
+    } else if (t1 != none && t2 == none) {
+        return t1;
+    } else if (t1 == none && t2 == none) {
+        return none;
+    }
+    if (t1 != t2) {
+        std::cout << "Error: wrong type: expected " << allTypesStringMappings[t1] << " got " << allTypesStringMappings[t2] << std::endl;
+        return none;
+    }
+    return t1;
+}
 
-// void typeVisitor(add_node* n, int tablevel) {
-//     if (n == nullptr) return;
-//     std::cout << getNTabs(tablevel) << "add: " << n->op << std::endl;
-// }
+allTypes typeVisitor(expression_node*);
 
-// void typeVisitor(id_node* n, int tablevel) {
-//     if (n == nullptr) return;
-//     std::cout << getNTabs(tablevel) << "id" << std::endl;
-// }
+allTypes typeVisitor(literal_node* n) {
+    return (allTypes)n->type;
+}
 
-// void typeVisitor(factor_node* n, int tablevel) {
-//     if (n == nullptr) return;
-//     std::cout << getNTabs(tablevel) << "factor" << std::endl;
-//     typeVisitor(n->id, tablevel + 1);
-//     typeVisitor(n->literal, tablevel + 1);
-//     typeVisitor(n->expression, tablevel + 1);
-// }
+Operator typeVisitor(multi_node* n) {
+    return n->op;
+}
 
-// void typeVisitor(factor_tail_node* n, int tablevel) {
-//     if (n == nullptr) return;
-//     std::cout << getNTabs(tablevel) << "factor tail" << std::endl;
-//     typeVisitor(n->multi, tablevel + 1);
-//     typeVisitor(n->factor, tablevel + 1);
-//     typeVisitor(n->factorTail, tablevel + 1);
-// }
+Operator typeVisitor(add_node* n) {
+    return n->op;
+}
 
-// void typeVisitor(term_node* n, int tablevel) {
-//     if (n == nullptr) return;
-//     std::cout << getNTabs(tablevel) << "term" << std::endl;
-//     typeVisitor(n->factor, tablevel + 1);
-//     typeVisitor(n->factorTail, tablevel + 1);
-// }
+std::string typeVisitor(id_node* n) {
+    return n->value;
+}
 
-// void typeVisitor(term_tail_node* n, int tablevel) {
-//     if (n == nullptr) return;
-//     std::cout << getNTabs(tablevel) << "term tail" << std::endl;
-//     typeVisitor(n->add, tablevel + 1);
-//     typeVisitor(n->term, tablevel + 1);
-//     typeVisitor(n->termTail, tablevel + 1);
-// }
+allTypes typeVisitor(factor_node* n) {
+    if (n == nullptr) return none;
+    if (n->expression != nullptr) {
+        return typeVisitor(n->expression);
+    } else if (n->literal != nullptr) {
+        return typeVisitor(n->literal);
+    }
+    return none;
+}
 
-// void typeVisitor(expression_node* n, int tablevel) {
-//     if (n == nullptr) return;
-//     std::cout << getNTabs(tablevel) << "expression" << std::endl;
-//     typeVisitor(n->term, tablevel + 1);
-//     typeVisitor(n->termTail, tablevel + 1);
-// }
+allTypes typeVisitor(factor_tail_node* n) {
+    if (n == nullptr) return none;
+    if (n->multi != nullptr) {
+        checkType(check_int, typeVisitor(n->factor));
+        checkType(check_int, typeVisitor(n->factorTail));
+        return check_int;
+    }
+    return none;
+}
 
-// void typeVisitor(assign_node* n, int tablevel) {
-//     if (n == nullptr) return;
-//     std::cout << getNTabs(tablevel) << "assign" << std::endl;
-//     typeVisitor(n->expression, tablevel + 1);
-// }
+allTypes typeVisitor(term_node* n) {
+    if (n == nullptr) return none;
+    allTypes t1 = typeVisitor(n->factor);
+    allTypes t2 = typeVisitor(n->factorTail);
+    return checkType(t1, t2);
+}
 
-// void typeVisitor(statement_node* n, int tablevel) {
-//     if (n == nullptr) return;
-//     std::cout << getNTabs(tablevel) << "statement" << std::endl;
-//     typeVisitor(n->assignment, tablevel + 1);
-// }
+allTypes typeVisitor(term_tail_node* n) {
+    if (n == nullptr) return none;
+    if (n->add != nullptr) {
+        checkType(check_int, typeVisitor(n->term));
+        checkType(check_int, typeVisitor(n->termTail));
+        return check_int;
+    }
+    return none;
+}
 
-// void typeVisitor(statement_list_node* n, int tablevel) {
-//     if (n == nullptr) return;
-//     std::cout << getNTabs(tablevel) << "statement list" << std::endl;
-//     typeVisitor(n->statement, tablevel + 1);
-//     typeVisitor(n->statementList, tablevel + 1);
-// }
+allTypes typeVisitor(expression_node* n) {
+    if (n == nullptr) return none;
+    allTypes t1 = typeVisitor(n->term);
+    allTypes t2 = typeVisitor(n->termTail);
+    return checkType(t1, t2);
+}
 
-// void typeVisitor(program_node* n, int tablevel) {
-//     if (n == nullptr) return;
-//     std::cout << getNTabs(tablevel) << "program" << std::endl;
-//     typeVisitor(n->statementList, tablevel + 1);
-// }
+void typeVisitor(print_node* n) {
+    if (n == nullptr) return;
+    typeVisitor(n->expression);
+}
 
-// void typeVisitor(program_node* n) {
-//     std::cout << "\nCHECK TYPE:\n" << std::endl;
-//     typeVisitor(n, 0);
-// }
+void typeVisitor(read_node* n) {
+    if (n == nullptr) return;
+    typeVisitor(n->id);
+}
 
-// std::string getNTabs(int n) {
-//     std::string tabs = "";
-//     for (int i = 0; i < n; i++) {
-//         tabs += "    ";
-//     }
-//     return tabs;
-// }
+void typeVisitor(assign_node* n) {
+    if (n == nullptr) return;
+    typeVisitor(n->expression);
+}
+
+void typeVisitor(statement_node* n) {
+    if (n == nullptr) return;
+    typeVisitor(n->assignment);
+    typeVisitor(n->print);
+    typeVisitor(n->read);
+}
+
+void typeVisitor(statement_list_node* n) {
+    if (n == nullptr) return;
+    typeVisitor(n->statement);
+    typeVisitor(n->statementList);
+}
+
+void typeVisitor(program_node* n) {
+    if (n == nullptr) return;
+    typeVisitor(n->statementList);
+}
