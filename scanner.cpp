@@ -57,8 +57,10 @@ Token Scanner::nextToken() {
                     // single comment, skip rest of line
                     do {
                         c = sourceFile.get();
-                        break;
                     } while (c != '\n' || c != EOF);
+                    column = 0;
+                    row++;
+                    break;
                 case '*':
                     // multiline comment, skip until "*/"
                     // DOES NOT WORK WITH NESTED MULTILINE COMMENTS

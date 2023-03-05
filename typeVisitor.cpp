@@ -17,8 +17,7 @@ std::string allTypesStringMappings[4] = {
     "bool type",
     "none"};
 
-allTypes
-checkType(allTypes t1, allTypes t2) {
+allTypes checkType(allTypes t1, allTypes t2) {
     if (t1 == none && t2 != none) {
         return t2;
     } else if (t1 != none && t2 == none) {
@@ -34,6 +33,7 @@ checkType(allTypes t1, allTypes t2) {
 }
 
 allTypes typeVisitor(expression_node*);
+void printVisitor(declare_node*);
 
 allTypes typeVisitor(literal_node* n) {
     return (allTypes)n->type;
@@ -105,14 +105,20 @@ void typeVisitor(read_node* n) {
     typeVisitor(n->id);
 }
 
-void typeVisitor(assign_node* n) {
+allTypes typeVisitor(assign_node* n) {
+    if (n == nullptr) return none;
+    return typeVisitor(n->expression);
+}
+
+void typeVisitor(declare_node* n) {
     if (n == nullptr) return;
-    typeVisitor(n->expression);
+    checkType((allTypes)n->type, typeVisitor(n->assignement));
 }
 
 void typeVisitor(statement_node* n) {
     if (n == nullptr) return;
     typeVisitor(n->assignment);
+    typeVisitor(n->declare);
     typeVisitor(n->print);
     typeVisitor(n->read);
 }

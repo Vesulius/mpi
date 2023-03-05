@@ -148,8 +148,9 @@ read_node* readVal() {
     }
 }
 
-assign_node* assignValue() {
+assign_node* assignValue(id_node* idNode) {
     assign_node* node = new assign_node();
+    node->id = idNode;
     switch (current) {
         case assign:
             match(assign);
@@ -163,22 +164,38 @@ assign_node* assignValue() {
     }
 }
 
+declare_node* declareVar() {
+    declare_node* node = new declare_node();
+    switch (current) {
+        case declare_var: {
+            match(declare_var);
+            id_node* idNode = idVal();
+            node->id = idNode;
+            match(declare_type);
+            node->type = std::get<Type>(scanner->getData());
+            match(type);
+            node->assignement = assignValue(idNode);
+            return node;
+        }
+        default:
+            printError();
+            return nullptr;
+    }
+}
+
 statement_node* statement() {
     statement_node* node = new statement_node();
     switch (current) {
         case declare_var:
-            match(declare_var);
-            node->id = idVal();
-            match(declare_type);
-            match(type);
-            node->assignment = assignValue();
+            node->declare = declareVar();
             match(endline);
             return node;
-        case id:
-            node->id = idVal();
-            node->assignment = assignValue();
+        case id: {
+            id_node* idNode = idVal();
+            node->assignment = assignValue(idNode);
             match(endline);
             return node;
+        }
         case print:
             node->print = printVal();
             match(endline);

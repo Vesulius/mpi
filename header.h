@@ -1,8 +1,8 @@
 #include <fstream>
+#include <map>
 #include <string>
 #include <variant>
 #include <vector>
-#include <map>
 
 enum Token { endfile,
              endline,
@@ -38,6 +38,8 @@ const std::string tokenStringMappings[19] = {"endfile",
                                              "read",
                                              "print"};
 
+// std::map<std::string, std::variant<std::string, int, bool>> table;
+
 enum Type {
     type_string,
     type_int,
@@ -47,8 +49,7 @@ enum Type {
 const std::string typeStringMappings[3] = {
     "type_string",
     "type_int",
-    "type_bool"
-};
+    "type_bool"};
 
 enum Operator {
     sum,
@@ -61,8 +62,7 @@ const std::string operatorStringMappings[4] = {
     "sum",
     "subraction",
     "multiplication",
-    "division"
-};
+    "division"};
 
 struct expression_node;
 
@@ -112,8 +112,14 @@ struct expression_node {
 };
 
 struct assign_node {
-    std::string id;
     expression_node* expression;
+    id_node* id;
+};
+
+struct declare_node {
+    id_node* id;
+    Type type;
+    assign_node* assignement;
 };
 
 struct print_node {
@@ -125,7 +131,7 @@ struct read_node {
 };
 
 struct statement_node {
-    id_node* id;
+    declare_node* declare;
     assign_node* assignment;
     print_node* print;
     read_node* read;

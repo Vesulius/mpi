@@ -85,13 +85,22 @@ void printVisitor(read_node* n, int tablevel) {
 void printVisitor(assign_node* n, int tablevel) {
     if (n == nullptr) return;
     std::cout << getNTabs(tablevel) << "assign" << std::endl;
+    printVisitor(n->id, tablevel + 1);
     printVisitor(n->expression, tablevel + 1);
+}
+
+void printVisitor(declare_node* n, int tablevel) {
+    if (n == nullptr) return;
+    std::cout << getNTabs(tablevel) << "declare " << typeStringMappings[n->type] << std::endl;
+    printVisitor(n->id, tablevel + 1);
+    printVisitor(n->assignement, tablevel + 1);
 }
 
 void printVisitor(statement_node* n, int tablevel) {
     if (n == nullptr) return;
     std::cout << getNTabs(tablevel) << "statement" << std::endl;
     printVisitor(n->assignment, tablevel + 1);
+    printVisitor(n->declare, tablevel + 1);
     printVisitor(n->print, tablevel + 1);
     printVisitor(n->read, tablevel + 1);
 }
