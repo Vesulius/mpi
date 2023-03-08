@@ -38,8 +38,6 @@ const std::string tokenStringMappings[19] = {"endfile",
                                              "read",
                                              "print"};
 
-// std::map<std::string, std::variant<std::string, int, bool>> table;
-
 enum Type {
     type_string,
     type_int,
@@ -63,6 +61,8 @@ const std::string operatorStringMappings[4] = {
     "subraction",
     "multiplication",
     "division"};
+
+extern std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>> symbolTable;
 
 struct expression_node;
 

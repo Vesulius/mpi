@@ -2,7 +2,7 @@
 
 #include "header.h"
 
-#define ANY
+std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>> symbolTable;
 
 enum allTypes {
     check_string,
@@ -107,11 +107,24 @@ void typeVisitor(read_node* n) {
 
 allTypes typeVisitor(assign_node* n) {
     if (n == nullptr) return none;
-    return typeVisitor(n->expression);
+    allTypes t = typeVisitor(n->expression);
+    std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>>::iterator it = symbolTable.find(n->id->value);
+
+    if (it == symbolTable.end()) {
+        std::cout << "Error: uninitialized variable: " << n->id->value << std::endl;
+    }
+    return checkType(t, (allTypes)it->second.first);
 }
 
 void typeVisitor(declare_node* n) {
     if (n == nullptr) return;
+    if (n->type == type_string) {
+        symbolTable[n->id->value] = {type_string, ""};
+    } else if (n->type == type_int) {
+        symbolTable[n->id->value] = {type_int, 0};
+    } else {
+        symbolTable[n->id->value] = {type_bool, true};
+    }
     checkType((allTypes)n->type, typeVisitor(n->assignement));
 }
 

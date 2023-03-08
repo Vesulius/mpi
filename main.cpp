@@ -4,8 +4,6 @@
 
 #include "header.h"
 
-std::vector<std::pair<Token, std::string>> tokens;
-
 int main(int argc, char** argv) {
     std::string sourceFilePath;
     if (argc > 1) {
@@ -15,6 +13,7 @@ int main(int argc, char** argv) {
     }
 
     Scanner* scann = new Scanner(sourceFilePath);
+
     // Token t = scann->nextToken();
 
     // while (t != endfile) {

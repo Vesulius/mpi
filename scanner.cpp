@@ -8,7 +8,7 @@
 Scanner::Scanner(std::string sourceFilePath) {
     sourceFile.open(sourceFilePath);
     if (!sourceFile.is_open()) {
-        std::cout << "Error: Unable to open source file " << sourceFilePath << std::endl;
+        std::cout << "IO error: unable to open source file " << sourceFilePath << std::endl;
     }
     row = 0;
     column = 0;
@@ -113,31 +113,37 @@ Token Scanner::nextToken() {
                 varBuild += c;
                 c = sourceFile.get();
                 if (varBuild == "var") {
+                    sourceFile.unget();
                     return declare_var;
                 }
                 if (varBuild == "if") {
+                    sourceFile.unget();
                     return if_stmt;
                 }
                 if (varBuild == "int") {
+                    sourceFile.unget();
                     data = type_int;
                     return type;
                 }
                 if (varBuild == "string") {
+                    sourceFile.unget();
                     data = type_string;
                     return type;
                 }
                 if (varBuild == "read") {
+                    sourceFile.unget();
                     return read;
                 }
                 if (varBuild == "print") {
+                    sourceFile.unget();
                     return print;
                 }
             }
             if (varBuild != "") {
                 data = varBuild;
+                sourceFile.unget();
                 return id;
             }
-            sourceFile.unget();
         }
     }
     std::cout << "Syntax error at" << getLocation() << ": bad token match" << std::endl;
