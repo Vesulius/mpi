@@ -2,7 +2,9 @@
 #include <iostream>
 #include <vector>
 
-#include "header.h"
+#include "types.h"
+#include "nodes.h"
+#include "general.h"
 
 int main(int argc, char** argv) {
     std::string sourceFilePath;

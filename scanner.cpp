@@ -3,7 +3,9 @@
 #include <variant>
 #include <vector>
 
-#include "header.h"
+#include "types.h"
+#include "nodes.h"
+#include "general.h"
 
 Scanner::Scanner(std::string sourceFilePath) {
     sourceFile.open(sourceFilePath);

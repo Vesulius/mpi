@@ -1,6 +1,8 @@
 #include <iostream>
 
-#include "header.h"
+#include "types.h"
+#include "nodes.h"
+#include "general.h"
 
 std::string getNTabs(int);
 

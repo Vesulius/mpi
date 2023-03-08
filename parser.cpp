@@ -1,7 +1,9 @@
 #include <iostream>
 #include <vector>
 
-#include "header.h"
+#include "types.h"
+#include "nodes.h"
+#include "general.h"
 
 Scanner* scanner;
 Token current;

@@ -1,6 +1,8 @@
 #include <iostream>
 
-#include "header.h"
+#include "types.h"
+#include "nodes.h"
+#include "general.h"
 
 std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>> symbolTable;
 
