@@ -1,3 +1,5 @@
+#pragma once
+
 #include <fstream>
 #include <map>
 #include <string>
@@ -11,16 +13,21 @@ class Scanner {
     std::ifstream sourceFile;
     int row;
     int column;
-    std::variant<std::string, int, Type, Operator> data;
+    std::variant<std::string, int, bool> data;
+    Type typeVal;
+    Operator opVal;
     Token current;
 
    public:
     Scanner(std::string);
     Token nextToken();
     std::string getLocation();
-    std::variant<std::string, int, Type, Operator> getData();
+    std::variant<std::string, int, bool> getData();
+    Type getType();
+    Operator getOperator();
 };
+
+program_node* parser(Scanner*);
 
 void printVisitor(program_node*);
 void typeVisitor(program_node*);
-program_node* parser(Scanner*);

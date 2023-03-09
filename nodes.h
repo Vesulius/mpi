@@ -1,3 +1,5 @@
+#pragma once
+
 #include <variant>
 
 struct expression_node;

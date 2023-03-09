@@ -17,12 +17,15 @@ expression_node* expression();
 
 literal_node* literalVal() {
     literal_node* node = new literal_node();
-    if (std::holds_alternative<int>(scanner->getData())) {
+    if (scanner->getType() == type_int) {
         node->value = std::get<int>(scanner->getData());
         node->type = type_int;
-    } else {
+    } else if (scanner->getType() == type_string) {
         node->value = std::get<std::string>(scanner->getData());
         node->type = type_string;
+    } else {
+        node->value = std::get<bool>(scanner->getData());
+        node->type = type_bool;
     }
     match(literal);
     return node;
@@ -37,14 +40,14 @@ id_node* idVal() {
 
 multi_node* multiVal() {
     multi_node* node = new multi_node();
-    node->op = std::get<Operator>(scanner->getData());
+    node->op = scanner->getOperator();
     match(multi);
     return node;
 }
 
 add_node* addVal() {
     add_node* node = new add_node();
-    node->op = std::get<Operator>(scanner->getData());
+    node->op = scanner->getOperator();
     match(add);
     return node;
 }
@@ -174,7 +177,7 @@ declare_node* declareVar() {
             id_node* idNode = idVal();
             node->id = idNode;
             match(declare_type);
-            node->type = std::get<Type>(scanner->getData());
+            node->type = scanner->getType();
             match(type);
             node->assignement = assignValue(idNode);
             return node;

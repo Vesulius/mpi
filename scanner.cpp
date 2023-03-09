@@ -27,13 +27,13 @@ Token Scanner::nextToken() {
             case ';':
                 return endline;
             case '+':
-                data = sum;
+                opVal = sum;
                 return add;
             case '-':
-                data = subraction;
+                opVal = subraction;
                 return add;
             case '*':
-                data = multiplication;
+                opVal = multiplication;
                 return multi;
             case '(':
                 return lbracet;
@@ -80,7 +80,7 @@ Token Scanner::nextToken() {
                     break;
                 default:
                     sourceFile.unget();
-                    data = division;
+                    opVal = division;
                     return multi;
             }
         }
@@ -95,6 +95,7 @@ Token Scanner::nextToken() {
                 std::cout << "Syntax error at" << getLocation() << ": string missing closing quotation mark" << std::endl;
             } else {
                 data = stringBuild;
+                typeVal = type_string;
                 return literal;
             }
         }
@@ -106,6 +107,7 @@ Token Scanner::nextToken() {
                 c = sourceFile.get();
             }
             data = std::stoi(numberBuild);
+            typeVal = type_int;
             sourceFile.unget();
             return literal;
         }
@@ -124,12 +126,12 @@ Token Scanner::nextToken() {
                 }
                 if (varBuild == "int") {
                     sourceFile.unget();
-                    data = type_int;
+                    typeVal = type_int;
                     return type;
                 }
                 if (varBuild == "string") {
                     sourceFile.unget();
-                    data = type_string;
+                    typeVal = type_string;
                     return type;
                 }
                 if (varBuild == "read") {
@@ -160,6 +162,14 @@ std::string Scanner::getLocation() {
     return s;
 }
 
-std::variant<std::string, int, Type, Operator> Scanner::getData() {
+std::variant<std::string, int, bool> Scanner::getData() {
     return data;
+};
+
+Operator Scanner::getOperator() {
+    return opVal;
+};
+
+Type Scanner::getType() {
+    return typeVal;
 };

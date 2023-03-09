@@ -8,7 +8,7 @@ This is a cource project for University of Helsinki.
 
 **Compile:** Using g++ compiler:
 
-``` g++ -o mpi mpi.cpp ```
+``` g++ ./*.cpp -o mpi ```
 
 this sould produce mpi binary file.
 
