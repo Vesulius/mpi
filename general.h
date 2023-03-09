@@ -31,3 +31,4 @@ program_node* parser(Scanner*);
 
 void printVisitor(program_node*);
 void typeVisitor(program_node*);
+void runnerVisitor(program_node*);
