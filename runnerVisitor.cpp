@@ -4,12 +4,17 @@
 #include "nodes.h"
 #include "general.h"
 
+std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>> symbolTable;
 #define valuePair std::pair<Type, std::variant<std::string, int, bool>>
+
+void killProgram() {
+    std::exit(0);
+}
 
 valuePair operate(Operator op, valuePair vp1, valuePair vp2) {
     if (vp1.first != vp2.first) {
         std::cout << "Runime error: cannot operate on differend types" << std::endl;
-        return vp1;
+        killProgram();
     }
     if (vp1.first == type_int) {
         switch (op) {
@@ -23,10 +28,10 @@ valuePair operate(Operator op, valuePair vp1, valuePair vp2) {
                 return {type_int, std::get<int>(vp1.second) / std::get<int>(vp2.second)};
         }
     }
-    if (vp1.first == type_string && op == multiplication) {
+    if (vp1.first == type_string && op == sum) {
         return {type_string, std::get<std::string>(vp1.second) + std::get<std::string>(vp2.second)};
     } else {
-        std::cout << "Runime error: string type cannot be operated with: " << operatorStringMappings[op] << std::endl;
+        std::cout << "Runtime error: string type cannot be operated with: " << operatorStringMappings[op] << std::endl;
         return vp1;
     }
 }
@@ -37,9 +42,30 @@ valuePair runnerVisitor(literal_node* n) {
     return {n->type, n->value};
 }
 
+valuePair getVarValue(id_node* n) {
+    std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>>::iterator it = symbolTable.find(n->value);
+    if (it == symbolTable.end()) {
+        std::cout << "Runtime error: cannot get uninitialized variable: " << n->value << std::endl;
+        killProgram();
+        return {type_bool, false};
+    } else {
+        return it->second;
+    }
+}
+
+void setVarValue(id_node* n, valuePair newPair) {
+    std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>>::iterator it = symbolTable.find(n->value);
+    if (it == symbolTable.end()) {
+        std::cout << "Runtime error: cannot set uninitialized variable: " << n->value << std::endl;
+        killProgram();
+    } else {
+        it->second = newPair;
+    }
+}
+
 valuePair runnerVisitor(factor_node* n) {
     if (n->id != nullptr) {
-        return symbolTable[n->id->value];
+        return getVarValue(n->id);
     } else if (n->literal != nullptr) {
         return runnerVisitor(n->literal);
     } else {
@@ -97,16 +123,26 @@ void runnerVisitor(read_node* n) {
 }
 
 void runnerVisitor(assign_node* n) {
-    symbolTable[n->id->value] = runnerVisitor(n->expression);
+    setVarValue(n->id, runnerVisitor(n->expression));
 }
 
 void runnerVisitor(declare_node* n) {
+    if (symbolTable.count(n->id->value)) {
+        std::cout << "Runtime error: var " << n->id->value << " has alredy been declared" << std::endl;
+        killProgram();
+    } else {
+        if (n->id->type == type_string) {
+            symbolTable[n->id->value] = {type_string, ""};
+        } else if (n->id->type == type_int) {
+            symbolTable[n->id->value] = {type_int, 0};
+        } else {
+            symbolTable[n->id->value] = {type_bool, true};
+        }
+    }
+
     if (n->assignement != nullptr) {
         runnerVisitor(n->assignement);
     }
-    // if (n == nullptr) return;
-    // runnerVisitor(n->id);
-    // runnerVisitor(n->assignement);
 }
 
 void runnerVisitor(statement_node* n) {
@@ -118,14 +154,14 @@ void runnerVisitor(statement_node* n) {
         runnerVisitor(n->declare);
     } else if (n->read != nullptr) {
         runnerVisitor(n->read);
-    } 
+    }
 }
 
 void runnerVisitor(statement_list_node* n) {
     runnerVisitor(n->statement);
     if (n->statementList != nullptr) {
         runnerVisitor(n->statementList);
-    } 
+    }
 }
 
 void runnerVisitor(program_node* n) {

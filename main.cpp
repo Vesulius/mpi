@@ -25,11 +25,10 @@ int main(int argc, char** argv) {
 
     program_node* programNode = parser(scann);
     printVisitor(programNode);
-    typeVisitor(programNode);
+    // typeVisitor(programNode);
 
-    std::cout << "PROGRAM OUTPUT:\n" << std::endl;
+    std::cout << "\nPROGRAM OUTPUT:\n" << std::endl;
 
     runnerVisitor(programNode);
-
     return 0;
 }
