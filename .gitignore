@@ -1,3 +1,9 @@
 .vscode
 mpi
+runnerVisitor
+printVisitor
+typeVisitor
+parser
+scanner
+main
 *.mp

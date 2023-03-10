@@ -120,14 +120,14 @@ allTypes typeVisitor(assign_node* n) {
 
 void typeVisitor(declare_node* n) {
     if (n == nullptr) return;
-    if (n->type == type_string) {
+    if (n->id->type == type_string) {
         symbolTable[n->id->value] = {type_string, ""};
-    } else if (n->type == type_int) {
+    } else if (n->id->type == type_int) {
         symbolTable[n->id->value] = {type_int, 0};
     } else {
         symbolTable[n->id->value] = {type_bool, true};
     }
-    checkType((allTypes)n->type, typeVisitor(n->assignement));
+    checkType((allTypes)n->id->type, typeVisitor(n->assignement));
 }
 
 void typeVisitor(statement_node* n) {

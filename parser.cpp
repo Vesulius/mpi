@@ -177,7 +177,7 @@ declare_node* declareVar() {
             id_node* idNode = idVal();
             node->id = idNode;
             match(declare_type);
-            node->type = scanner->getType();
+            node->id->type = scanner->getType();
             match(type);
             node->assignement = assignValue(idNode);
             return node;

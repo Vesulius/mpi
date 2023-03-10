@@ -31,7 +31,7 @@ void printVisitor(add_node* n, int tablevel) {
 
 void printVisitor(id_node* n, int tablevel) {
     if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "id: " << n->value << std::endl;
+    std::cout << getNTabs(tablevel) << "id: " << typeStringMappings[n->type] << " " << n->value << std::endl;
 }
 
 void printVisitor(factor_node* n, int tablevel) {
@@ -93,7 +93,7 @@ void printVisitor(assign_node* n, int tablevel) {
 
 void printVisitor(declare_node* n, int tablevel) {
     if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "declare " << typeStringMappings[n->type] << std::endl;
+    std::cout << getNTabs(tablevel) << "declare " << std::endl;
     printVisitor(n->id, tablevel + 1);
     printVisitor(n->assignement, tablevel + 1);
 }

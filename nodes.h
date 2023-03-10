@@ -5,6 +5,7 @@
 struct expression_node;
 
 struct id_node {
+    Type type;
     std::string value;
 };
 
@@ -56,7 +57,6 @@ struct assign_node {
 
 struct declare_node {
     id_node* id;
-    Type type;
     assign_node* assignement;
 };
 
