@@ -7,6 +7,7 @@
 std::string getNTabs(int);
 
 void printVisitor(expression_node*, int);
+void printVisitor(statement_list_node*, int);
 
 void printVisitor(literal_node* n, int tablevel) {
     if (n == nullptr) return;
@@ -93,9 +94,17 @@ void printVisitor(assign_node* n, int tablevel) {
 
 void printVisitor(declare_node* n, int tablevel) {
     if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "declare " << std::endl;
+    std::cout << getNTabs(tablevel) << "declare" << std::endl;
     printVisitor(n->id, tablevel + 1);
     printVisitor(n->assignement, tablevel + 1);
+}
+
+void printVisitor(if_node* n, int tablevel) {
+    if (n == nullptr) return;
+    std::cout << getNTabs(tablevel) << "if" << std::endl;
+    printVisitor(n->expression, tablevel + 1);
+    printVisitor(n->statementList, tablevel + 1);
+    std::cout << getNTabs(tablevel) << "end if" << std::endl;
 }
 
 void printVisitor(statement_node* n, int tablevel) {
@@ -105,6 +114,7 @@ void printVisitor(statement_node* n, int tablevel) {
     printVisitor(n->declare, tablevel + 1);
     printVisitor(n->print, tablevel + 1);
     printVisitor(n->read, tablevel + 1);
+    printVisitor(n->ifStatement, tablevel + 1);
 }
 
 void printVisitor(statement_list_node* n, int tablevel) {

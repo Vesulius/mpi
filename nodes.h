@@ -3,6 +3,7 @@
 #include <variant>
 
 struct expression_node;
+struct statement_list_node;
 
 struct id_node {
     Type type;
@@ -68,11 +69,17 @@ struct read_node {
     id_node* id;
 };
 
+struct if_node {
+    expression_node* expression;
+    statement_list_node* statementList;
+};
+
 struct statement_node {
     declare_node* declare;
     assign_node* assignment;
     print_node* print;
     read_node* read;
+    if_node* ifStatement;
 };
 
 struct statement_list_node {

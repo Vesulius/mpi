@@ -134,6 +134,11 @@ Token Scanner::nextToken() {
                     typeVal = type_string;
                     return type;
                 }
+                if (varBuild == "bool") {
+                    sourceFile.unget();
+                    typeVal = type_bool;
+                    return type;
+                }
                 if (varBuild == "read") {
                     sourceFile.unget();
                     return read;
@@ -141,6 +146,26 @@ Token Scanner::nextToken() {
                 if (varBuild == "print") {
                     sourceFile.unget();
                     return print;
+                }
+                if (varBuild == "end") {
+                    sourceFile.unget();
+                    return end_statement;
+                }
+                if (varBuild == "true") {
+                    sourceFile.unget();
+                    data = true;
+                    typeVal = type_bool;
+                    return literal;
+                }
+                if (varBuild == "false") {
+                    sourceFile.unget();
+                    data = false;
+                    typeVal = type_bool;
+                    return literal;
+                }
+                if (varBuild == "do") {
+                    sourceFile.unget();
+                    return do_statement;
                 }
             }
             if (varBuild != "") {

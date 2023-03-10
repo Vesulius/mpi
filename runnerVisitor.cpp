@@ -8,6 +8,8 @@
 
 std::map<std::string, valuePair> symbolTable;
 
+void runnerVisitor(statement_list_node*);
+
 void killProgram() {
     std::exit(0);
 }
@@ -166,6 +168,18 @@ void runnerVisitor(declare_node* n) {
     }
 }
 
+void runIf(if_node* n) {
+    valuePair vp = runnerVisitor(n->expression);
+    if (vp.first != type_bool) {
+        std::cout << "Runtime error: if statements can only assess bool types" << std::endl;
+        killProgram();
+    } else {
+        if (std::get<bool>(vp.second)) {
+            runnerVisitor(n->statementList);
+        }
+    }
+}
+
 void runnerVisitor(statement_node* n) {
     if (n->print != nullptr) {
         runnerVisitor(n->print);
@@ -175,6 +189,8 @@ void runnerVisitor(statement_node* n) {
         runnerVisitor(n->declare);
     } else if (n->read != nullptr) {
         runnerVisitor(n->read);
+    } else if (n->ifStatement != nullptr) {
+        runIf(n->ifStatement);
     }
 }
 

@@ -13,6 +13,7 @@ void printError();
 program_node* program();
 statement_node* statement();
 statement_list_node* statementList();
+statement_list_node* statementList(bool);
 expression_node* expression();
 
 literal_node* literalVal() {
@@ -188,6 +189,23 @@ declare_node* declareVar() {
     }
 }
 
+if_node* createIf() {
+    if_node* node = new if_node();
+    switch (current) {
+        case if_stmt:
+            match(if_stmt);
+            node->expression = expression();
+            match(do_statement);
+            node->statementList = statementList(true);
+            match(end_statement);
+            match(if_stmt);
+            return node;
+        default:
+            printError();
+            return nullptr;
+    }
+}
+
 statement_node* statement() {
     statement_node* node = new statement_node();
     switch (current) {
@@ -209,6 +227,10 @@ statement_node* statement() {
             node->read = readVal();
             match(endline);
             return node;
+        case if_stmt:
+            node->ifStatement = createIf();
+            match(endline);
+            return node;
         case endfile:
             match(endfile);
             return nullptr;
@@ -226,6 +248,20 @@ statement_list_node* statementList() {
         default:
             node->statement = statement();
             node->statementList = statementList();
+            return node;
+    }
+}
+
+statement_list_node* statementList(bool insideIf) {
+    statement_list_node* node = new statement_list_node();
+    switch (current) {
+        case endfile:
+            return nullptr;
+        case end_statement:
+            return nullptr;
+        default:
+            node->statement = statement();
+            node->statementList = statementList(true);
             return node;
     }
 }

@@ -17,18 +17,15 @@ int main(int argc, char** argv) {
     Scanner* scann = new Scanner(sourceFilePath);
 
     // Token t = scann->nextToken();
-
     // while (t != endfile) {
-    //     std::cout << tokenStringMappings[t] << " " << std::endl;
+    //     std::cout << tokenStringMappings[t] << std::endl;
     //     t = scann->nextToken();
     // }
 
     program_node* programNode = parser(scann);
     printVisitor(programNode);
-    // typeVisitor(programNode);
-
     std::cout << "\nPROGRAM OUTPUT:\n" << std::endl;
-
     runnerVisitor(programNode);
+
     return 0;
 }
