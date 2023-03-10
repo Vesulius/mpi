@@ -41,9 +41,9 @@ enum Type { type_string,
             type_bool
 };
 
-const std::string typeStringMappings[3] = {"type_string",
-                                           "type_int",
-                                           "type_bool"};
+const std::string typeStringMappings[3] = {"string type",
+                                           "int type",
+                                           "bool type"};
 
 enum Operator { sum,
                 subraction,

@@ -4,8 +4,9 @@
 #include "nodes.h"
 #include "general.h"
 
-std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>> symbolTable;
 #define valuePair std::pair<Type, std::variant<std::string, int, bool>>
+
+std::map<std::string, valuePair> symbolTable;
 
 void killProgram() {
     std::exit(0);
@@ -56,7 +57,10 @@ valuePair getVarValue(id_node* n) {
 void setVarValue(id_node* n, valuePair newPair) {
     std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>>::iterator it = symbolTable.find(n->value);
     if (it == symbolTable.end()) {
-        std::cout << "Runtime error: cannot set uninitialized variable: " << n->value << std::endl;
+        std::cout << "Runtime error: cannot assing value to uninitialized variable: " << n->value << std::endl;
+        killProgram();
+    } else if (it->second.first != newPair.first) {
+        std::cout << "Runtime error: cannot assing " << typeStringMappings[newPair.first] << " value to " << typeStringMappings[it->second.first] << " variable" << std::endl;
         killProgram();
     } else {
         it->second = newPair;
@@ -118,8 +122,25 @@ void runnerVisitor(print_node* n) {
 }
 
 void runnerVisitor(read_node* n) {
-    // if (n == nullptr) return;
-    // runnerVisitor(n->id);
+    std::string input;
+    std::cin >> input;
+    if (n->id->type == type_int) {
+        std::string::const_iterator it = input.begin();
+        while (it != input.end() && std::isdigit(*it)) it++;
+        if (it == input.end()) {
+            setVarValue(n->id, {type_int, std::stoi(input)});
+        } else {
+            setVarValue(n->id, {type_string, input});
+        }
+    } else if (n->id->type == type_string) {
+        setVarValue(n->id, {type_string, input});
+    } else {
+        if (input == "false" || input == "true") {
+            setVarValue(n->id, {type_bool, input});
+        } else {
+            setVarValue(n->id, {type_string, input});
+        }
+    }
 }
 
 void runnerVisitor(assign_node* n) {
