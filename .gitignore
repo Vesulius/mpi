@@ -1,9 +1,5 @@
-.vscode
-mpi
-runnerVisitor
-printVisitor
-typeVisitor
-parser
-scanner
-main
-*.mp
+*
+!*.cpp
+!*.h
+!.gitignore
+!*.md

@@ -32,7 +32,7 @@ literal_node* literalVal() {
     return node;
 }
 
-id_node* idVal() {
+id_node* createId() {
     id_node* node = new id_node();
     node->value = std::get<std::string>(scanner->getData());
     match(id);
@@ -57,7 +57,7 @@ factor_node* factor() {
     factor_node* node = new factor_node();
     switch (current) {
         case id:
-            node->id = idVal();
+            node->id = createId();
             return node;
         case literal:
             node->literal = literalVal();
@@ -147,7 +147,7 @@ read_node* readVal() {
     switch (current) {
         case read:
             match(read);
-            node->id = idVal();
+            node->id = createId();
             return node;
         default:
             return nullptr;
@@ -175,10 +175,10 @@ declare_node* declareVar() {
     switch (current) {
         case declare_var: {
             match(declare_var);
-            id_node* idNode = idVal();
+            id_node* idNode = createId();
             node->id = idNode;
             match(declare_type);
-            node->id->type = scanner->getType();
+            node->type = scanner->getType();
             match(type);
             node->assignement = assignValue(idNode);
             return node;
@@ -206,6 +206,27 @@ if_node* createIf() {
     }
 }
 
+for_node* createFor() {
+    for_node* node = new for_node();
+    switch (current) {
+        case for_stmt:
+            match(for_stmt);
+            node->id = createId();
+            match(in_statement);
+            node->startExpression = expression();
+            match(dotdot);
+            node->endExpression = expression();
+            match(do_statement);
+            node->statementList = statementList(true);
+            match(end_statement);
+            match(for_stmt);
+            return node;
+        default:
+            printError();
+            return nullptr;
+    }
+}
+
 statement_node* statement() {
     statement_node* node = new statement_node();
     switch (current) {
@@ -214,7 +235,7 @@ statement_node* statement() {
             match(endline);
             return node;
         case id: {
-            id_node* idNode = idVal();
+            id_node* idNode = createId();
             node->assignment = assignValue(idNode);
             match(endline);
             return node;
@@ -229,6 +250,10 @@ statement_node* statement() {
             return node;
         case if_stmt:
             node->ifStatement = createIf();
+            match(endline);
+            return node;
+        case for_stmt:
+            node->forStatement = createFor();
             match(endline);
             return node;
         case endfile:

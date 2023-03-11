@@ -126,7 +126,7 @@ void runnerVisitor(print_node* n) {
 void runnerVisitor(read_node* n) {
     std::string input;
     std::cin >> input;
-    if (n->id->type == type_int) {
+    if (getVarValue(n->id).first == type_int) {
         std::string::const_iterator it = input.begin();
         while (it != input.end() && std::isdigit(*it)) it++;
         if (it == input.end()) {
@@ -134,7 +134,7 @@ void runnerVisitor(read_node* n) {
         } else {
             setVarValue(n->id, {type_string, input});
         }
-    } else if (n->id->type == type_string) {
+    } else if (getVarValue(n->id).first == type_string) {
         setVarValue(n->id, {type_string, input});
     } else {
         if (input == "false" || input == "true") {
@@ -154,9 +154,9 @@ void runnerVisitor(declare_node* n) {
         std::cout << "Runtime error: var " << n->id->value << " has alredy been declared" << std::endl;
         killProgram();
     } else {
-        if (n->id->type == type_string) {
+        if (n->type == type_string) {
             symbolTable[n->id->value] = {type_string, ""};
-        } else if (n->id->type == type_int) {
+        } else if (n->type == type_int) {
             symbolTable[n->id->value] = {type_int, 0};
         } else {
             symbolTable[n->id->value] = {type_bool, true};
@@ -180,6 +180,35 @@ void runIf(if_node* n) {
     }
 }
 
+void runFor(for_node* n) {
+    if (getVarValue(n->id).first != type_int) {
+        std::cout << "Runtime error: for statement variable " << n->id->value << " must be int type" << std::endl;
+        killProgram();
+    }
+    valuePair start = runnerVisitor(n->startExpression);
+    valuePair end = runnerVisitor(n->endExpression);
+    if (start.first != type_int) {
+        std::cout << "Runtime error: for statement start value must be int type" << std::endl;
+        killProgram();
+    }
+    if (end.first != type_int) {
+        std::cout << "Runtime error: for statement end value must be int type" << std::endl;
+        killProgram();
+    }
+    if (start.second > end.second) {
+        std::cout << "Runtime error: for statement start value must be greater than end value" << std::endl;
+        killProgram();
+    }
+    setVarValue(n->id, start);
+    int index = std::get<int>(start.second);
+    if (n->statementList != nullptr) {
+        while (index != std::get<int>(end.second)) {
+            runnerVisitor(n->statementList);
+            setVarValue(n->id, {type_int, ++index});
+        }
+    }
+}
+
 void runnerVisitor(statement_node* n) {
     if (n->print != nullptr) {
         runnerVisitor(n->print);
@@ -191,6 +220,8 @@ void runnerVisitor(statement_node* n) {
         runnerVisitor(n->read);
     } else if (n->ifStatement != nullptr) {
         runIf(n->ifStatement);
+    } else if (n->forStatement != nullptr) {
+        runFor(n->forStatement);
     }
 }
 

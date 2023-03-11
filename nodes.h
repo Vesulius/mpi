@@ -6,7 +6,6 @@ struct expression_node;
 struct statement_list_node;
 
 struct id_node {
-    Type type;
     std::string value;
 };
 
@@ -58,6 +57,7 @@ struct assign_node {
 
 struct declare_node {
     id_node* id;
+    Type type;
     assign_node* assignement;
 };
 
@@ -74,12 +74,20 @@ struct if_node {
     statement_list_node* statementList;
 };
 
+struct for_node {
+    id_node* id;
+    expression_node* startExpression;
+    expression_node* endExpression;
+    statement_list_node* statementList;
+};
+
 struct statement_node {
     declare_node* declare;
     assign_node* assignment;
     print_node* print;
     read_node* read;
     if_node* ifStatement;
+    for_node* forStatement;
 };
 
 struct statement_list_node {

@@ -32,7 +32,7 @@ void printVisitor(add_node* n, int tablevel) {
 
 void printVisitor(id_node* n, int tablevel) {
     if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "id: " << typeStringMappings[n->type] << " " << n->value << std::endl;
+    std::cout << getNTabs(tablevel) << "id: " << n->value << std::endl;
 }
 
 void printVisitor(factor_node* n, int tablevel) {
@@ -107,6 +107,19 @@ void printVisitor(if_node* n, int tablevel) {
     std::cout << getNTabs(tablevel) << "end if" << std::endl;
 }
 
+void printVisitor(for_node* n, int tablevel) {
+    if (n == nullptr) return;
+    std::cout << getNTabs(tablevel) << "for" << std::endl;
+    printVisitor(n->id, tablevel + 1);
+    std::cout << getNTabs(tablevel) << "from" << std::endl;
+    printVisitor(n->startExpression, tablevel + 1);
+    std::cout << getNTabs(tablevel) << "to" << std::endl;
+    printVisitor(n->endExpression, tablevel + 1);
+    std::cout << getNTabs(tablevel) << "do" << std::endl;
+    printVisitor(n->statementList, tablevel + 1);
+    std::cout << getNTabs(tablevel) << "for if" << std::endl;
+}
+
 void printVisitor(statement_node* n, int tablevel) {
     if (n == nullptr) return;
     std::cout << getNTabs(tablevel) << "statement" << std::endl;
@@ -115,6 +128,7 @@ void printVisitor(statement_node* n, int tablevel) {
     printVisitor(n->print, tablevel + 1);
     printVisitor(n->read, tablevel + 1);
     printVisitor(n->ifStatement, tablevel + 1);
+    printVisitor(n->forStatement, tablevel + 1);
 }
 
 void printVisitor(statement_list_node* n, int tablevel) {

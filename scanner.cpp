@@ -39,6 +39,14 @@ Token Scanner::nextToken() {
                 return lbracet;
             case ')':
                 return rbracet;
+            case '.':
+                if (sourceFile.peek() == '.') {
+                    sourceFile.get();
+                    return dotdot;
+                } else {
+                    std::cout << "Syntax error at" << getLocation() << ": keyword .. is missing second dot" << std::endl;
+                    break;
+                }
             case ':':
                 c = sourceFile.get();
                 if (c == '=') {
@@ -116,61 +124,58 @@ Token Scanner::nextToken() {
             return literal;
         }
         if (std::isalpha(c)) {
-            std::string varBuild = "";
+            std::string varBuild;
             while (std::isalpha(c)) {
                 varBuild += c;
-                c = sourceFile.get();
                 if (varBuild == "var") {
-                    sourceFile.unget();
                     return declare_var;
                 }
                 if (varBuild == "if") {
-                    sourceFile.unget();
                     return if_stmt;
                 }
-                if (varBuild == "int") {
-                    sourceFile.unget();
-                    typeVal = type_int;
-                    return type;
+                if (varBuild == "for") {
+                    return for_stmt;
+                }
+                if (varBuild == "in") {
+                    if (sourceFile.peek() == 't') {
+                        sourceFile.get();
+                        typeVal = type_int;
+                        return type;
+                    } else {
+                        return in_statement;
+                    }
                 }
                 if (varBuild == "string") {
-                    sourceFile.unget();
                     typeVal = type_string;
                     return type;
                 }
                 if (varBuild == "bool") {
-                    sourceFile.unget();
                     typeVal = type_bool;
                     return type;
                 }
                 if (varBuild == "read") {
-                    sourceFile.unget();
                     return read;
                 }
                 if (varBuild == "print") {
-                    sourceFile.unget();
                     return print;
                 }
                 if (varBuild == "end") {
-                    sourceFile.unget();
                     return end_statement;
                 }
                 if (varBuild == "true") {
-                    sourceFile.unget();
                     data = true;
                     typeVal = type_bool;
                     return literal;
                 }
                 if (varBuild == "false") {
-                    sourceFile.unget();
                     data = false;
                     typeVal = type_bool;
                     return literal;
                 }
                 if (varBuild == "do") {
-                    sourceFile.unget();
                     return do_statement;
                 }
+                c = sourceFile.get();
             }
             if (varBuild != "") {
                 data = varBuild;
