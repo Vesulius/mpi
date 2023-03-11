@@ -12,8 +12,8 @@ Scanner::Scanner(std::string sourceFilePath) {
     if (!sourceFile.is_open()) {
         std::cout << "IO error: unable to open source file " << sourceFilePath << std::endl;
     }
-    row = 0;
-    column = 0;
+    row = 1;
+    column = 1;
 }
 
 Token Scanner::nextToken() {
@@ -48,7 +48,7 @@ Token Scanner::nextToken() {
                     return declare_type;
                 }
             case '\n':
-                column = 0;
+                column = 1;
                 row++;
                 break;
         }
@@ -57,9 +57,13 @@ Token Scanner::nextToken() {
             switch (c) {
                 case '/':
                     // single comment, skip rest of line
-                    do {
+                    while (c != '\n' && c != EOF) {
                         c = sourceFile.get();
-                    } while (c != '\n' || c != EOF);
+                    }
+                    if (c == EOF) {
+                        return endfile;
+                    }
+                    sourceFile.unget();
                     column = 0;
                     row++;
                     break;

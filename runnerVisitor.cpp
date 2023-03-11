@@ -174,7 +174,7 @@ void runIf(if_node* n) {
         std::cout << "Runtime error: if statements can only assess bool types" << std::endl;
         killProgram();
     } else {
-        if (std::get<bool>(vp.second)) {
+        if (std::get<bool>(vp.second) && n->statementList != nullptr) {
             runnerVisitor(n->statementList);
         }
     }
@@ -202,5 +202,7 @@ void runnerVisitor(statement_list_node* n) {
 }
 
 void runnerVisitor(program_node* n) {
-    runnerVisitor(n->statementList);
+    if (n->statementList != nullptr) {
+        runnerVisitor(n->statementList);
+    }
 }
