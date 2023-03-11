@@ -54,6 +54,7 @@ struct term_tail_node {
 };
 
 struct expression_node {
+    bool negative;
     term_node* term;
     term_tail_node* termTail;
     std::pair<int, int> location;

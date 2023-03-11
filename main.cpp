@@ -22,10 +22,14 @@ int main(int argc, char** argv) {
     //     t = scann->nextToken();
     // }
 
-    program_node* programNode = parser(scann);
-    printVisitor(programNode);
-    std::cout << "\nPROGRAM OUTPUT:\n" << std::endl;
-    runnerVisitor(programNode);
+    bool parserError = false;
+    program_node* programNode = parser(scann, &parserError);
 
+    if (!parserError) {
+        printVisitor(programNode);
+        std::cout << "\nPROGRAM OUTPUT:\n"
+                  << std::endl;
+        runnerVisitor(programNode);
+    }
     return 0;
 }

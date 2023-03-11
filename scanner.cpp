@@ -45,6 +45,8 @@ Token Scanner::nextToken() {
             case '&':
                 opVal = conjunction;
                 return add;
+            case '!':
+                return negation;
             case '.':
                 if (sourceFile.peek() == '.') {
                     sourceFile.get();

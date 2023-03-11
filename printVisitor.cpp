@@ -68,7 +68,11 @@ void printVisitor(term_tail_node* n, int tablevel) {
 
 void printVisitor(expression_node* n, int tablevel) {
     if (n == nullptr) return;
-    std::cout << getNTabs(tablevel) << "expression" << std::endl;
+    if (n->negative) {
+        std::cout << getNTabs(tablevel) << "!expression" << std::endl;
+    } else {
+        std::cout << getNTabs(tablevel) << "expression" << std::endl;
+    }
     printVisitor(n->term, tablevel + 1);
     printVisitor(n->termTail, tablevel + 1);
 }

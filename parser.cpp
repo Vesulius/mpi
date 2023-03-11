@@ -6,7 +6,9 @@
 #include "general.h"
 
 Scanner* scanner;
+bool* parseError;
 Token current;
+
 void match(Token expected);
 void printError();
 
@@ -89,7 +91,6 @@ factor_tail_node* factorTail() {
             return node;
         case endline:
         case endfile:
-            return nullptr;
         default:
             return nullptr;
     }
@@ -119,7 +120,6 @@ term_tail_node* termTail() {
             return node;
         case endline:
         case endfile:
-            return nullptr;
         default:
             return nullptr;
     }
@@ -127,15 +127,18 @@ term_tail_node* termTail() {
 
 expression_node* expression() {
     expression_node* node = new expression_node();
+    node->negative = false;
     node->location = scanner->getLocation();
     switch (current) {
         case endfile:
             return nullptr;
-        default: {
+        case negation:
+            match(negation);
+            node->negative = true;
+        default:
             node->term = term();
             node->termTail = termTail();
             return node;
-        }
     }
 }
 
@@ -317,6 +320,7 @@ void match(Token expected) {
     if (current != expected) {
         std::cout << "Parsing error at " << scanner->getStringLocation() << ": unexpected token: " << tokenStringMappings[current] << ". Expected: " << tokenStringMappings[expected] << std::endl;
         current = endfile;
+        *parseError = true;
         return;
     } else if (expected == endfile) {
         return;
@@ -328,10 +332,12 @@ void match(Token expected) {
 void printError() {
     std::cout << "Parsing error at " << scanner->getStringLocation() << ": unexpected token: " << tokenStringMappings[current] << std::endl;
     current = endfile;
+    *parseError = true;
 }
 
-program_node* parser(Scanner* s) {
+program_node* parser(Scanner* s, bool* error) {
     scanner = s;
+    parseError = error;
     current = scanner->nextToken();
     std::cout << "Current token: " << tokenStringMappings[current] << std::endl;
     return program();

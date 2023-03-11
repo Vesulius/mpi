@@ -28,7 +28,8 @@ class Scanner {
     Operator getOperator();
 };
 
-program_node* parser(Scanner*);
+program_node* parser(Scanner*, bool*);
+extern bool* parserError;
 
 void printVisitor(program_node*);
 void typeVisitor(program_node*);

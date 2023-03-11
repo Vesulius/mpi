@@ -131,11 +131,21 @@ valuePair runnerVisitor(term_tail_node* n) {
 }
 
 valuePair runnerVisitor(expression_node* n) {
+    valuePair vp;
     if (n->termTail == nullptr) {
-        return runnerVisitor(n->term);
+        vp = runnerVisitor(n->term);
     } else {
-        return operate(n->termTail->add->op, runnerVisitor(n->term), runnerVisitor(n->termTail), n->location);
+        vp = operate(n->termTail->add->op, runnerVisitor(n->term), runnerVisitor(n->termTail), n->location);
     }
+    if (n->negative) {
+        if (vp.first == type_bool) {
+            return {vp.first, !std::get<bool>(vp.second)};
+        } else {
+            std::cout << "Runtime error at " << locToStr(n->location) << ":  ! operator is only applicable to bool type values" << std::endl;
+            killProgram();
+        }
+    }
+    return vp;
 }
 
 void runnerVisitor(print_node* n) {
