@@ -39,6 +39,12 @@ Token Scanner::nextToken() {
                 return lbracet;
             case ')':
                 return rbracet;
+            case '=':
+                opVal = equals;
+                return add;
+            case '&':
+                opVal = conjunction;
+                return add;
             case '.':
                 if (sourceFile.peek() == '.') {
                     sourceFile.get();

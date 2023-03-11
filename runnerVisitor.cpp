@@ -34,14 +34,36 @@ valuePair operate(Operator op, valuePair vp1, valuePair vp2, std::pair<int, int>
                 return {type_int, std::get<int>(vp1.second) * std::get<int>(vp2.second)};
             case division:
                 return {type_int, std::get<int>(vp1.second) / std::get<int>(vp2.second)};
+            case equals:
+                return {type_bool, std::get<int>(vp1.second) == std::get<int>(vp2.second)};
+            default:
+                std::cout << "Runtime error at " << locToStr(location) << ": int type cannot be operated with: " << operatorStringMappings[op] << std::endl;
+                killProgram();
+        }
+    } else if (vp1.first == type_string) {
+        switch (op) {
+            case sum:
+                return {type_string, std::get<std::string>(vp1.second) + std::get<std::string>(vp2.second)};
+            case equals:
+                return {type_bool, std::get<std::string>(vp1.second) == std::get<std::string>(vp2.second)};
+            default:
+                std::cout << "Runtime error at " << locToStr(location) << ": string type cannot be operated with: " << operatorStringMappings[op] << std::endl;
+                killProgram();
+        }
+    } else {
+        switch (op) {
+            case equals:
+                return {type_bool, std::get<bool>(vp1.second) == std::get<bool>(vp2.second)};
+            case conjunction:
+                return {type_bool, std::get<bool>(vp1.second) && std::get<bool>(vp2.second)};
+            default:
+                std::cout << "Runtime error at " << locToStr(location) << ": string type cannot be operated with: " << operatorStringMappings[op] << std::endl;
+                killProgram();
         }
     }
-    if (vp1.first == type_string && op == sum) {
-        return {type_string, std::get<std::string>(vp1.second) + std::get<std::string>(vp2.second)};
-    } else {
-        std::cout << "Runtime error at " << locToStr(location) << ": string type cannot be operated with: " << operatorStringMappings[op] << std::endl;
-        return vp1;
-    }
+    std::cout << "Runtime error at " << locToStr(location) << ": oparating error with: " << operatorStringMappings[op] << std::endl;
+    killProgram();
+    return vp1;
 }
 
 valuePair runnerVisitor(expression_node*);
@@ -53,7 +75,7 @@ valuePair runnerVisitor(literal_node* n) {
 valuePair getVarValue(id_node* n) {
     std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>>::iterator it = symbolTable.find(n->value);
     if (it == symbolTable.end()) {
-        std::cout << "Runtime error at " <<  locToStr(n->location) << ": cannot get uninitialized variable: " << n->value << std::endl;
+        std::cout << "Runtime error at " << locToStr(n->location) << ": cannot get uninitialized variable: " << n->value << std::endl;
         killProgram();
         return {type_bool, false};
     } else {
@@ -64,10 +86,10 @@ valuePair getVarValue(id_node* n) {
 void setVarValue(id_node* n, valuePair newPair) {
     std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>>::iterator it = symbolTable.find(n->value);
     if (it == symbolTable.end()) {
-        std::cout << "Runtime error at " <<  locToStr(n->location) << ": cannot assing value to uninitialized variable: " << n->value << std::endl;
+        std::cout << "Runtime error at " << locToStr(n->location) << ": cannot assing value to uninitialized variable: " << n->value << std::endl;
         killProgram();
     } else if (it->second.first != newPair.first) {
-        std::cout << "Runtime error at " <<  locToStr(n->location) << ": cannot assing " << typeStringMappings[newPair.first] << " value to " << typeStringMappings[it->second.first] << " variable" << std::endl;
+        std::cout << "Runtime error at " << locToStr(n->location) << ": cannot assing " << typeStringMappings[newPair.first] << " value to " << typeStringMappings[it->second.first] << " variable" << std::endl;
         killProgram();
     } else {
         it->second = newPair;
@@ -156,7 +178,7 @@ void runnerVisitor(assign_node* n) {
 
 void runnerVisitor(declare_node* n) {
     if (symbolTable.count(n->id->value)) {
-        std::cout << "Runtime error at " <<  locToStr(n->location) << ": var " << n->id->value << " has alredy been declared" << std::endl;
+        std::cout << "Runtime error at " << locToStr(n->location) << ": var " << n->id->value << " has alredy been declared" << std::endl;
         killProgram();
     } else {
         if (n->type == type_string) {
@@ -176,7 +198,7 @@ void runnerVisitor(declare_node* n) {
 void runIf(if_node* n) {
     valuePair vp = runnerVisitor(n->expression);
     if (vp.first != type_bool) {
-        std::cout << "Runtime error at " <<  locToStr(n->location) << ": if statements can only assess bool types" << std::endl;
+        std::cout << "Runtime error at " << locToStr(n->location) << ": if statements can only assess bool types" << std::endl;
         killProgram();
     } else {
         if (std::get<bool>(vp.second) && n->statementList != nullptr) {
@@ -187,21 +209,21 @@ void runIf(if_node* n) {
 
 void runFor(for_node* n) {
     if (getVarValue(n->id).first != type_int) {
-        std::cout << "Runtime error at " <<  locToStr(n->location) << ": for statement variable " << n->id->value << " must be int type" << std::endl;
+        std::cout << "Runtime error at " << locToStr(n->location) << ": for statement variable " << n->id->value << " must be int type" << std::endl;
         killProgram();
     }
     valuePair start = runnerVisitor(n->startExpression);
     valuePair end = runnerVisitor(n->endExpression);
     if (start.first != type_int) {
-        std::cout << "Runtime error at " <<  locToStr(n->location) << ": for statement start value must be int type" << std::endl;
+        std::cout << "Runtime error at " << locToStr(n->location) << ": for statement start value must be int type" << std::endl;
         killProgram();
     }
     if (end.first != type_int) {
-        std::cout << "Runtime error at " <<  locToStr(n->location) << ": for statement end value must be int type" << std::endl;
+        std::cout << "Runtime error at " << locToStr(n->location) << ": for statement end value must be int type" << std::endl;
         killProgram();
     }
     if (start.second > end.second) {
-        std::cout << "Runtime error at " <<  locToStr(n->location) << ": for statement start value must be greater than end value" << std::endl;
+        std::cout << "Runtime error at " << locToStr(n->location) << ": for statement start value must be greater than end value" << std::endl;
         killProgram();
     }
     setVarValue(n->id, start);

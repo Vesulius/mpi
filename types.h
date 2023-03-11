@@ -56,10 +56,14 @@ const std::string typeStringMappings[3] = {"string type",
 enum Operator { sum,
                 subraction,
                 multiplication,
-                division
+                division,
+                equals,
+                conjunction,
 };
 
-const std::string operatorStringMappings[4] = {"sum",
+const std::string operatorStringMappings[7] = {"sum",
                                                "subraction",
                                                "multiplication",
-                                               "division"};
+                                               "division",
+                                               "=",
+                                               "&"};
