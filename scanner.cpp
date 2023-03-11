@@ -44,7 +44,7 @@ Token Scanner::nextToken() {
                     sourceFile.get();
                     return dotdot;
                 } else {
-                    std::cout << "Syntax error at" << getLocation() << ": keyword .. is missing second dot" << std::endl;
+                    std::cout << "Syntax error at" << getStringLocation() << ": keyword .. is missing second dot" << std::endl;
                     break;
                 }
             case ':':
@@ -104,7 +104,7 @@ Token Scanner::nextToken() {
                 c = sourceFile.get();
             }
             if (c == EOF) {
-                std::cout << "Syntax error at" << getLocation() << ": string missing closing quotation mark" << std::endl;
+                std::cout << "Syntax error at" << getStringLocation() << ": string missing closing quotation mark" << std::endl;
             } else {
                 data = stringBuild;
                 typeVal = type_string;
@@ -184,16 +184,20 @@ Token Scanner::nextToken() {
             }
         }
     }
-    std::cout << "Syntax error at" << getLocation() << ": bad token match" << std::endl;
+    std::cout << "Syntax error at" << getStringLocation() << ": bad token match" << std::endl;
     return endfile;
 }
 
-std::string Scanner::getLocation() {
+std::string Scanner::getStringLocation() {
     std::string s = "column: ";
     s += std::to_string(column);
     s += " row: ";
     s += std::to_string(row);
     return s;
+}
+
+std::pair<int, int> Scanner::getLocation() {
+    return {column, row};
 }
 
 std::variant<std::string, int, bool> Scanner::getData() {
