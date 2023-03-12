@@ -83,21 +83,21 @@ Token Scanner::nextToken() {
                     column = 0;
                     row++;
                     break;
-                case '*':
+                case '*': {
                     // multiline comment, skip until "*/"
-                    // DOES NOT WORK WITH NESTED MULTILINE COMMENTS
-                    while (true) {
+                    int commentDepth = 1;
+                    while (commentDepth > 0) {
                         c = sourceFile.get();
-                        if (c == '*') {
-                            c = sourceFile.get();
-                            if (c == '/') {
-                                break;
-                            } else {
-                                sourceFile.unget();
-                            }
+                        if (c == '*' && sourceFile.peek() == '/') {
+                            commentDepth--;
+                            sourceFile.get();
+                        } else if (c == '/' && sourceFile.peek() == '*') {
+                            commentDepth++;
+                            sourceFile.get();
                         }
                     }
                     break;
+                }
                 default:
                     sourceFile.unget();
                     opVal = division;
