@@ -4,9 +4,11 @@
 #include "nodes.h"
 #include "general.h"
 
-#define valuePair std::pair<Type, std::variant<std::string, int, bool>>
+#define ValuePair std::pair<Type, std::variant<std::string, int, bool>>
+#define MaxScope 5
 
-std::map<std::string, valuePair> symbolTable;
+std::map<std::string, ValuePair> tables[MaxScope];
+int scope = 0;
 
 void runnerVisitor(statement_list_node*);
 
@@ -14,7 +16,7 @@ void killProgram() {
     std::exit(0);
 }
 
-valuePair operate(Operator op, valuePair vp1, valuePair vp2, std::pair<int, int> location) {
+ValuePair operate(Operator op, ValuePair vp1, ValuePair vp2, std::pair<int, int> location) {
     if (vp1.first != vp2.first) {
         std::cout << "Runime error at " << locToStr(location) << ": cannot operate on differend types" << std::endl;
         killProgram();
@@ -62,18 +64,24 @@ valuePair operate(Operator op, valuePair vp1, valuePair vp2, std::pair<int, int>
     }
     std::cout << "Runtime error at " << locToStr(location) << ": oparating error with: " << operatorStringMappings[op] << std::endl;
     killProgram();
-    return vp1;
+    return {type_bool, false};
 }
 
-valuePair runnerVisitor(expression_node*);
+ValuePair runnerVisitor(expression_node*);
 
-valuePair runnerVisitor(literal_node* n) {
+ValuePair runnerVisitor(literal_node* n) {
     return {n->type, n->value};
 }
 
-valuePair getVarValue(id_node* n) {
-    std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>>::iterator it = symbolTable.find(n->value);
-    if (it == symbolTable.end()) {
+ValuePair getVarValue(id_node* n) {
+    std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>>::iterator it;
+    for (int i = scope; i >= 0; i--) {
+        it = tables[i].find(n->value);
+        if (it != tables[i].end()) {
+            break;
+        }
+    }
+    if (it == tables[0].end()) {
         std::cout << "Runtime error at " << locToStr(n->location) << ": cannot get uninitialized variable: " << n->value << std::endl;
         killProgram();
         return {type_bool, false};
@@ -82,9 +90,15 @@ valuePair getVarValue(id_node* n) {
     }
 }
 
-void setVarValue(id_node* n, valuePair newPair) {
-    std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>>::iterator it = symbolTable.find(n->value);
-    if (it == symbolTable.end()) {
+void setVarValue(id_node* n, ValuePair newPair) {
+    std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>>::iterator it;
+    for (int i = scope; i >= 0; i--) {
+        it = tables[i].find(n->value);
+        if (it != tables[i].end()) {
+            break;
+        }
+    }
+    if (it == tables[0].end()) {
         std::cout << "Runtime error at " << locToStr(n->location) << ": cannot assing value to uninitialized variable: " << n->value << std::endl;
         killProgram();
     } else if (it->second.first != newPair.first) {
@@ -95,7 +109,7 @@ void setVarValue(id_node* n, valuePair newPair) {
     }
 }
 
-valuePair runnerVisitor(factor_node* n) {
+ValuePair runnerVisitor(factor_node* n) {
     if (n->id != nullptr) {
         return getVarValue(n->id);
     } else if (n->literal != nullptr) {
@@ -105,7 +119,7 @@ valuePair runnerVisitor(factor_node* n) {
     }
 }
 
-valuePair runnerVisitor(factor_tail_node* n) {
+ValuePair runnerVisitor(factor_tail_node* n) {
     if (n->factorTail == nullptr) {
         return runnerVisitor(n->factor);
     } else {
@@ -113,7 +127,7 @@ valuePair runnerVisitor(factor_tail_node* n) {
     }
 }
 
-valuePair runnerVisitor(term_node* n) {
+ValuePair runnerVisitor(term_node* n) {
     if (n->factorTail == nullptr) {
         return runnerVisitor(n->factor);
     } else {
@@ -121,7 +135,7 @@ valuePair runnerVisitor(term_node* n) {
     }
 }
 
-valuePair runnerVisitor(term_tail_node* n) {
+ValuePair runnerVisitor(term_tail_node* n) {
     if (n->termTail == nullptr) {
         return runnerVisitor(n->term);
     } else {
@@ -129,8 +143,8 @@ valuePair runnerVisitor(term_tail_node* n) {
     }
 }
 
-valuePair runnerVisitor(expression_node* n) {
-    valuePair vp;
+ValuePair runnerVisitor(expression_node* n) {
+    ValuePair vp;
     if (n->termTail == nullptr) {
         vp = runnerVisitor(n->term);
     } else {
@@ -148,7 +162,7 @@ valuePair runnerVisitor(expression_node* n) {
 }
 
 void runPrint(print_node* n) {
-    valuePair pair = runnerVisitor(n->expression);
+    ValuePair pair = runnerVisitor(n->expression);
     if (pair.first == type_bool) {
         std::string boolString = std::get<bool>(pair.second) ? "true" : "false";
         std::cout << boolString << std::endl;
@@ -186,16 +200,16 @@ void runnerVisitor(assign_node* n) {
 }
 
 void runnerVisitor(declare_node* n) {
-    if (symbolTable.count(n->id->value)) {
+    if (tables[scope].count(n->id->value)) {
         std::cout << "Runtime error at " << locToStr(n->location) << ": var " << n->id->value << " has alredy been declared" << std::endl;
         killProgram();
     } else {
         if (n->type == type_string) {
-            symbolTable[n->id->value] = {type_string, ""};
+            tables[scope][n->id->value] = {type_string, ""};
         } else if (n->type == type_int) {
-            symbolTable[n->id->value] = {type_int, 0};
+            tables[scope][n->id->value] = {type_int, 0};
         } else {
-            symbolTable[n->id->value] = {type_bool, true};
+            tables[scope][n->id->value] = {type_bool, true};
         }
     }
 
@@ -205,7 +219,12 @@ void runnerVisitor(declare_node* n) {
 }
 
 void runIf(if_node* n) {
-    valuePair vp = runnerVisitor(n->expression);
+    scope++;
+    if (scope >= MaxScope) {
+        std::cout << "Runtime error at " << locToStr(n->location) << ": scope depth of " << MaxScope << " exceeded" << std::endl;
+        killProgram();
+    }
+    ValuePair vp = runnerVisitor(n->expression);
     if (vp.first != type_bool) {
         std::cout << "Runtime error at " << locToStr(n->location) << ": if statements can only assess bool types" << std::endl;
         killProgram();
@@ -213,6 +232,8 @@ void runIf(if_node* n) {
         if (std::get<bool>(vp.second) && n->statementList != nullptr) {
             runnerVisitor(n->statementList);
         }
+        tables[scope].clear();
+        scope--;
     }
 }
 
@@ -221,8 +242,8 @@ void runFor(for_node* n) {
         std::cout << "Runtime error at " << locToStr(n->location) << ": for statement variable " << n->id->value << " must be int type" << std::endl;
         killProgram();
     }
-    valuePair start = runnerVisitor(n->startExpression);
-    valuePair end = runnerVisitor(n->endExpression);
+    ValuePair start = runnerVisitor(n->startExpression);
+    ValuePair end = runnerVisitor(n->endExpression);
     if (start.first != type_int) {
         std::cout << "Runtime error at " << locToStr(n->location) << ": for statement start value must be int type" << std::endl;
         killProgram();
@@ -237,12 +258,20 @@ void runFor(for_node* n) {
     }
     setVarValue(n->id, start);
     int index = std::get<int>(start.second);
+    scope++;
+    if (scope >= MaxScope) {
+        std::cout << "Runtime error at " << locToStr(n->location) << ": scope depth of " << MaxScope << " exceeded" << std::endl;
+        killProgram();
+    }
     if (n->statementList != nullptr) {
         while (index <= std::get<int>(end.second)) {
             runnerVisitor(n->statementList);
             setVarValue(n->id, {type_int, ++index});
+            tables[scope].clear();
         }
     }
+    tables[scope].clear();
+    scope--;
 }
 
 void runnerVisitor(statement_node* n) {

@@ -6,8 +6,6 @@
 #include <variant>
 #include <vector>
 
-extern std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>> symbolTable;
-
 class Scanner {
     std::ifstream sourceFile;
     bool* error;
