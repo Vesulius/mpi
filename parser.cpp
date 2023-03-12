@@ -76,6 +76,7 @@ factor_node* factor() {
             return node;
         default:
             printError();
+            delete node;
             return nullptr;
     }
 }
@@ -92,6 +93,7 @@ factor_tail_node* factorTail() {
         case endline:
         case endfile:
         default:
+            delete node;
             return nullptr;
     }
 }
@@ -101,6 +103,7 @@ term_node* term() {
     node->location = scanner->getLocation();
     switch (current) {
         case endfile:
+            delete node;
             return nullptr;
         default:
             node->factor = factor();
@@ -121,6 +124,7 @@ term_tail_node* termTail() {
         case endline:
         case endfile:
         default:
+            delete node;
             return nullptr;
     }
 }
@@ -131,6 +135,7 @@ expression_node* expression() {
     node->location = scanner->getLocation();
     switch (current) {
         case endfile:
+            delete node;
             return nullptr;
         case negation:
             match(negation);
@@ -151,6 +156,7 @@ print_node* printVal() {
             node->expression = expression();
             return node;
         default:
+            delete node;
             return nullptr;
     }
 }
@@ -164,6 +170,7 @@ read_node* readVal() {
             node->id = createId();
             return node;
         default:
+            delete node;
             return nullptr;
     }
 }
@@ -178,6 +185,7 @@ assign_node* assignValue(id_node* idNode) {
             node->expression = expression();
             return node;
         case endline:
+            delete node;
             return nullptr;
         default:
             printError();
@@ -201,6 +209,7 @@ declare_node* declareVar() {
         }
         default:
             printError();
+            delete node;
             return nullptr;
     }
 }
@@ -219,6 +228,7 @@ if_node* createIf() {
             return node;
         default:
             printError();
+            delete node;
             return nullptr;
     }
 }
@@ -241,6 +251,7 @@ for_node* createFor() {
             return node;
         default:
             printError();
+            delete node;
             return nullptr;
     }
 }
@@ -276,9 +287,11 @@ statement_node* statement() {
             return node;
         case endfile:
             match(endfile);
+            delete node;
             return nullptr;
         default:
             printError();
+            delete node;
             return node;
     }
 }
@@ -287,6 +300,7 @@ statement_list_node* statementList() {
     statement_list_node* node = new statement_list_node();
     switch (current) {
         case endfile:
+            delete node;
             return nullptr;
         default:
             node->statement = statement();
@@ -299,8 +313,8 @@ statement_list_node* statementList(bool insideIf) {
     statement_list_node* node = new statement_list_node();
     switch (current) {
         case endfile:
-            return nullptr;
         case end_statement:
+            delete node;
             return nullptr;
         default:
             node->statement = statement();
@@ -318,7 +332,7 @@ program_node* program() {
 
 void match(Token expected) {
     if (current != expected) {
-        std::cout << "Parsing error at " << scanner->getStringLocation() << ": unexpected token: " << tokenStringMappings[current] << ". Expected: " << tokenStringMappings[expected] << std::endl;
+        std::cout << "Parsing error at " << locToStr(scanner->getLocation()) << ": unexpected token: " << tokenStringMappings[current] << ". Expected: " << tokenStringMappings[expected] << std::endl;
         current = endfile;
         *error = true;
         return;
@@ -330,7 +344,7 @@ void match(Token expected) {
 }
 
 void printError() {
-    std::cout << "Parsing error at " << scanner->getStringLocation() << ": unexpected token: " << tokenStringMappings[current] << std::endl;
+    std::cout << "Parsing error at " << locToStr(scanner->getLocation())  << ": unexpected token: " << tokenStringMappings[current] << std::endl;
     current = endfile;
     *error = true;
 }

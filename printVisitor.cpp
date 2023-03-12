@@ -121,7 +121,7 @@ void printVisitor(for_node* n, int tablevel) {
     printVisitor(n->endExpression, tablevel + 1);
     std::cout << getNTabs(tablevel) << "do" << std::endl;
     printVisitor(n->statementList, tablevel + 1);
-    std::cout << getNTabs(tablevel) << "for if" << std::endl;
+    std::cout << getNTabs(tablevel) << "end for" << std::endl;
 }
 
 void printVisitor(statement_node* n, int tablevel) {

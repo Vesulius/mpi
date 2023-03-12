@@ -59,7 +59,7 @@ Token Scanner::nextToken() {
                     sourceFile.get();
                     return dotdot;
                 } else {
-                    std::cout << "Syntax error at" << getStringLocation() << ": keyword .. is missing second dot" << std::endl;
+                    std::cout << "Syntax error at" << locToStr(getLocation()) << ": keyword .. is missing second dot" << std::endl;
                     *error = true;
                     break;
                 }
@@ -103,7 +103,7 @@ Token Scanner::nextToken() {
                             commentDepth++;
                             sourceFile.get();
                         } else if (c == EOF) {
-                            std::cout << "Syntax error at" << getStringLocation() << ": multiline comment missing closing tag" << std::endl;
+                            std::cout << "Syntax error at" << locToStr(getLocation()) << ": multiline comment missing closing tag" << std::endl;
                             *error = true;
                             break;
                         }
@@ -124,7 +124,7 @@ Token Scanner::nextToken() {
                 c = sourceFile.get();
             }
             if (c == EOF) {
-                std::cout << "Syntax error at" << getStringLocation() << ": string missing closing quotation mark" << std::endl;
+                std::cout << "Syntax error at" << locToStr(getLocation()) << ": string missing closing quotation mark" << std::endl;
                 *error = true;
             } else {
                 data = stringBuild;
@@ -205,17 +205,9 @@ Token Scanner::nextToken() {
             }
         }
     }
-    std::cout << "Syntax error at" << getStringLocation() << ": bad token match" << std::endl;
+    std::cout << "Syntax error at " << locToStr(getLocation()) << ": bad token match" << std::endl;
     *error = true;
     return endfile;
-}
-
-std::string Scanner::getStringLocation() {
-    std::string s = "column: ";
-    s += std::to_string(column);
-    s += " row: ";
-    s += std::to_string(row);
-    return s;
 }
 
 std::pair<int, int> Scanner::getLocation() {

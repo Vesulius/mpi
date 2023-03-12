@@ -27,8 +27,7 @@ int main(int argc, char** argv) {
 
     if (!error) {
         printVisitor(programNode);
-        std::cout << "\nPROGRAM OUTPUT:\n"
-                  << std::endl;
+        std::cout << "\nPROGRAM OUTPUT:" << std::endl;
         runnerVisitor(programNode);
     }
     return 0;

@@ -10,11 +10,6 @@ std::map<std::string, valuePair> symbolTable;
 
 void runnerVisitor(statement_list_node*);
 
-std::string locToStr(std::pair<int, int> pair) {
-    std::string s = std::to_string(pair.first) + "," + std::to_string(pair.second);
-    return s;
-}
-
 void killProgram() {
     std::exit(0);
 }
@@ -152,7 +147,7 @@ valuePair runnerVisitor(expression_node* n) {
     return vp;
 }
 
-void runnerVisitor(print_node* n) {
+void runPrint(print_node* n) {
     valuePair pair = runnerVisitor(n->expression);
     if (pair.first == type_bool) {
         std::string boolString = std::get<bool>(pair.second) ? "true" : "false";
@@ -243,7 +238,7 @@ void runFor(for_node* n) {
     setVarValue(n->id, start);
     int index = std::get<int>(start.second);
     if (n->statementList != nullptr) {
-        while (index != std::get<int>(end.second)) {
+        while (index <= std::get<int>(end.second)) {
             runnerVisitor(n->statementList);
             setVarValue(n->id, {type_int, ++index});
         }
@@ -252,7 +247,7 @@ void runFor(for_node* n) {
 
 void runnerVisitor(statement_node* n) {
     if (n->print != nullptr) {
-        runnerVisitor(n->print);
+        runPrint(n->print);
     } else if (n->assignment != nullptr) {
         runnerVisitor(n->assignment);
     } else if (n->declare != nullptr) {

@@ -22,7 +22,6 @@ class Scanner {
    public:
     Scanner(std::string, bool* error);
     Token nextToken();
-    std::string getStringLocation();
     std::pair<int, int> getLocation();
     std::variant<std::string, int, bool> getData();
     Type getType();
@@ -32,6 +31,10 @@ class Scanner {
 program_node* parser(Scanner*, bool*);
 extern bool* error;
 
+static std::string locToStr(std::pair<int, int> pair) {
+    std::string s = std::to_string(pair.first) + "," + std::to_string(pair.second);
+    return s;
+}
 void printVisitor(program_node*);
 void typeVisitor(program_node*);
 void runnerVisitor(program_node*);
