@@ -22,7 +22,12 @@ literal_node* literalVal() {
     literal_node* node = new literal_node();
     node->location = scanner->getLocation();
     if (scanner->getType() == type_int) {
-        node->value = std::get<int>(scanner->getData());
+        if (current == add && scanner->getOperator() == subraction) {
+            match(add);
+            node->value = -1 * std::get<int>(scanner->getData());
+        } else {
+            node->value = std::get<int>(scanner->getData());
+        }
         node->type = type_int;
     } else if (scanner->getType() == type_string) {
         node->value = std::get<std::string>(scanner->getData());
@@ -66,6 +71,7 @@ factor_node* factor() {
         case id:
             node->id = createId();
             return node;
+        case add:
         case literal:
             node->literal = literalVal();
             return node;
@@ -331,7 +337,7 @@ void match(Token expected) {
 }
 
 void printError() {
-    std::cout << "Parsing error at " << locToStr(scanner->getLocation())  << ": unexpected token: " << tokenStringMappings[current] << std::endl;
+    std::cout << "Parsing error at " << locToStr(scanner->getLocation()) << ": unexpected token: " << tokenStringMappings[current] << std::endl;
     current = endfile;
     *error = true;
 }
