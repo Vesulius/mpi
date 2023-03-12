@@ -222,7 +222,7 @@ if_node* createIf() {
             match(if_stmt);
             node->expression = expression();
             match(do_statement);
-            node->statementList = statementList(true);
+            node->statementList = statementList();
             match(end_statement);
             match(if_stmt);
             return node;
@@ -245,7 +245,7 @@ for_node* createFor() {
             match(dotdot);
             node->endExpression = expression();
             match(do_statement);
-            node->statementList = statementList(true);
+            node->statementList = statementList();
             match(end_statement);
             match(for_stmt);
             return node;
@@ -299,26 +299,13 @@ statement_node* statement() {
 statement_list_node* statementList() {
     statement_list_node* node = new statement_list_node();
     switch (current) {
+        case end_statement:
         case endfile:
             delete node;
             return nullptr;
         default:
             node->statement = statement();
             node->statementList = statementList();
-            return node;
-    }
-}
-
-statement_list_node* statementList(bool insideIf) {
-    statement_list_node* node = new statement_list_node();
-    switch (current) {
-        case endfile:
-        case end_statement:
-            delete node;
-            return nullptr;
-        default:
-            node->statement = statement();
-            node->statementList = statementList(true);
             return node;
     }
 }

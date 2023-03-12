@@ -17,13 +17,16 @@ Scanner::Scanner(std::string sourceFilePath, bool* e) {
     column = 1;
 }
 
+Scanner::~Scanner() {
+    sourceFile.close();
+}
+
 Token Scanner::nextToken() {
     while (sourceFile.is_open()) {
         c = sourceFile.get();
         column++;
         switch (c) {
             case EOF:
-                sourceFile.close();
                 return endfile;
             case ';':
                 return endline;

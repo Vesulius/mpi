@@ -21,6 +21,7 @@ class Scanner {
 
    public:
     Scanner(std::string, bool* error);
+    ~Scanner();
     Token nextToken();
     std::pair<int, int> getLocation();
     std::variant<std::string, int, bool> getData();

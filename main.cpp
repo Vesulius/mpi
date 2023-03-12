@@ -15,15 +15,16 @@ int main(int argc, char** argv) {
     }
     bool error = false;
 
-    Scanner* scann = new Scanner(sourceFilePath, &error);
+    Scanner* scanner = new Scanner(sourceFilePath, &error);
 
-    // Token t = scann->nextToken();
+    // Token t = scanner->nextToken();
     // while (t != endfile) {
     //     std::cout << tokenStringMappings[t] << std::endl;
-    //     t = scann->nextToken();
+    //     t = scanner->nextToken();
     // }
 
-    program_node* programNode = parser(scann, &error);
+    program_node* programNode = parser(scanner, &error);
+    delete scanner;
 
     if (!error) {
         printVisitor(programNode);
