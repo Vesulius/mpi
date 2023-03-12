@@ -13,8 +13,9 @@ int main(int argc, char** argv) {
     } else {
         sourceFilePath = "test.mp";
     }
+    bool error = false;
 
-    Scanner* scann = new Scanner(sourceFilePath);
+    Scanner* scann = new Scanner(sourceFilePath, &error);
 
     // Token t = scann->nextToken();
     // while (t != endfile) {
@@ -22,10 +23,9 @@ int main(int argc, char** argv) {
     //     t = scann->nextToken();
     // }
 
-    bool parserError = false;
-    program_node* programNode = parser(scann, &parserError);
+    program_node* programNode = parser(scann, &error);
 
-    if (!parserError) {
+    if (!error) {
         printVisitor(programNode);
         std::cout << "\nPROGRAM OUTPUT:\n"
                   << std::endl;

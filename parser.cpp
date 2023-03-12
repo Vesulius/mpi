@@ -6,7 +6,7 @@
 #include "general.h"
 
 Scanner* scanner;
-bool* parseError;
+bool* error;
 Token current;
 
 void match(Token expected);
@@ -320,7 +320,7 @@ void match(Token expected) {
     if (current != expected) {
         std::cout << "Parsing error at " << scanner->getStringLocation() << ": unexpected token: " << tokenStringMappings[current] << ". Expected: " << tokenStringMappings[expected] << std::endl;
         current = endfile;
-        *parseError = true;
+        *error = true;
         return;
     } else if (expected == endfile) {
         return;
@@ -332,12 +332,12 @@ void match(Token expected) {
 void printError() {
     std::cout << "Parsing error at " << scanner->getStringLocation() << ": unexpected token: " << tokenStringMappings[current] << std::endl;
     current = endfile;
-    *parseError = true;
+    *error = true;
 }
 
-program_node* parser(Scanner* s, bool* error) {
+program_node* parser(Scanner* s, bool* e) {
     scanner = s;
-    parseError = error;
+    error = e;
     current = scanner->nextToken();
     std::cout << "Current token: " << tokenStringMappings[current] << std::endl;
     return program();

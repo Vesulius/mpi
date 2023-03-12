@@ -57,7 +57,7 @@ valuePair operate(Operator op, valuePair vp1, valuePair vp2, std::pair<int, int>
             case conjunction:
                 return {type_bool, std::get<bool>(vp1.second) && std::get<bool>(vp2.second)};
             default:
-                std::cout << "Runtime error at " << locToStr(location) << ": string type cannot be operated with: " << operatorStringMappings[op] << std::endl;
+                std::cout << "Runtime error at " << locToStr(location) << ": bool type cannot be operated with: " << operatorStringMappings[op] << std::endl;
                 killProgram();
         }
     }
@@ -160,7 +160,7 @@ void runnerVisitor(print_node* n) {
     }
 }
 
-void runnerVisitor(read_node* n) {
+void runRead(read_node* n) {
     std::string input;
     std::cin >> input;
     if (getVarValue(n->id).first == type_int) {
@@ -254,7 +254,7 @@ void runnerVisitor(statement_node* n) {
     } else if (n->declare != nullptr) {
         runnerVisitor(n->declare);
     } else if (n->read != nullptr) {
-        runnerVisitor(n->read);
+        runRead(n->read);
     } else if (n->ifStatement != nullptr) {
         runIf(n->ifStatement);
     } else if (n->forStatement != nullptr) {

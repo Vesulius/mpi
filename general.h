@@ -9,8 +9,9 @@
 extern std::map<std::string, std::pair<Type, std::variant<std::string, int, bool>>> symbolTable;
 
 class Scanner {
-    char c;
     std::ifstream sourceFile;
+    bool* error;
+    char c;
     int row;
     int column;
     std::variant<std::string, int, bool> data;
@@ -19,7 +20,7 @@ class Scanner {
     Token current;
 
    public:
-    Scanner(std::string);
+    Scanner(std::string, bool* error);
     Token nextToken();
     std::string getStringLocation();
     std::pair<int, int> getLocation();
@@ -29,7 +30,7 @@ class Scanner {
 };
 
 program_node* parser(Scanner*, bool*);
-extern bool* parserError;
+extern bool* error;
 
 void printVisitor(program_node*);
 void typeVisitor(program_node*);

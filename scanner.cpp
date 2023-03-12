@@ -7,7 +7,8 @@
 #include "nodes.h"
 #include "general.h"
 
-Scanner::Scanner(std::string sourceFilePath) {
+Scanner::Scanner(std::string sourceFilePath, bool* e) {
+    error = e;
     sourceFile.open(sourceFilePath);
     if (!sourceFile.is_open()) {
         std::cout << "IO error: unable to open source file " << sourceFilePath << std::endl;
@@ -53,6 +54,7 @@ Token Scanner::nextToken() {
                     return dotdot;
                 } else {
                     std::cout << "Syntax error at" << getStringLocation() << ": keyword .. is missing second dot" << std::endl;
+                    *error = true;
                     break;
                 }
             case ':':
@@ -94,6 +96,10 @@ Token Scanner::nextToken() {
                         } else if (c == '/' && sourceFile.peek() == '*') {
                             commentDepth++;
                             sourceFile.get();
+                        } else if (c == EOF) {
+                            std::cout << "Syntax error at" << getStringLocation() << ": multiline comment missing closing tag" << std::endl;
+                            *error = true;
+                            break;
                         }
                     }
                     break;
@@ -113,6 +119,7 @@ Token Scanner::nextToken() {
             }
             if (c == EOF) {
                 std::cout << "Syntax error at" << getStringLocation() << ": string missing closing quotation mark" << std::endl;
+                *error = true;
             } else {
                 data = stringBuild;
                 typeVal = type_string;
@@ -193,6 +200,7 @@ Token Scanner::nextToken() {
         }
     }
     std::cout << "Syntax error at" << getStringLocation() << ": bad token match" << std::endl;
+    *error = true;
     return endfile;
 }
 
