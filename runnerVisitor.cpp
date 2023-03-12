@@ -36,6 +36,10 @@ valuePair operate(Operator op, valuePair vp1, valuePair vp2, std::pair<int, int>
                 return {type_int, std::get<int>(vp1.second) / std::get<int>(vp2.second)};
             case equals:
                 return {type_bool, std::get<int>(vp1.second) == std::get<int>(vp2.second)};
+            case less:
+                return {type_bool, std::get<int>(vp1.second) < std::get<int>(vp2.second)};
+            case greater:
+                return {type_bool, std::get<int>(vp1.second) > std::get<int>(vp2.second)};
             default:
                 std::cout << "Runtime error at " << locToStr(location) << ": int type cannot be operated with: " << operatorStringMappings[op] << std::endl;
                 killProgram();

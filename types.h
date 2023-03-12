@@ -61,11 +61,15 @@ enum Operator { sum,
                 division,
                 equals,
                 conjunction,
+                less,
+                greater
 };
 
-const std::string operatorStringMappings[7] = {"sum",
+const std::string operatorStringMappings[9] = {"sum",
                                                "subraction",
                                                "multiplication",
                                                "division",
                                                "=",
-                                               "&"};
+                                               "&",
+                                               "<",
+                                               ">"};

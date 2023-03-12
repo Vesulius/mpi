@@ -46,6 +46,12 @@ Token Scanner::nextToken() {
             case '&':
                 opVal = conjunction;
                 return add;
+            case '<':
+                opVal = less;
+                return add;
+            case '>':
+                opVal = greater;
+                return add;
             case '!':
                 return negation;
             case '.':
