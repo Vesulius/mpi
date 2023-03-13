@@ -8,6 +8,7 @@
 Scanner* scanner;
 bool* error;
 Token current;
+bool errorRecovery = false;
 
 void match(Token expected);
 void printError();
@@ -311,6 +312,11 @@ statement_list_node* statementList() {
             return nullptr;
         default:
             node->statement = statement();
+            if (errorRecovery) {
+                // error encountered in statement
+                node->statement = nullptr;
+                errorRecovery = false;
+            }
             node->statementList = statementList();
             return node;
     }
@@ -323,11 +329,23 @@ program_node* program() {
     return node;
 }
 
+void skipToNextStatement() {
+    while (current != endline) {
+        current = scanner->nextToken();
+    }
+    current = scanner->nextToken();
+}
+
 void match(Token expected) {
+    if (errorRecovery) {
+        return;
+    }
     if (current != expected) {
         std::cout << "Parsing error at " << locToStr(scanner->getLocation()) << ": unexpected token: " << tokenStringMappings[current] << ". Expected: " << tokenStringMappings[expected] << std::endl;
         current = endfile;
         *error = true;
+        errorRecovery = true;
+        skipToNextStatement();
         return;
     } else if (expected == endfile) {
         return;
@@ -337,9 +355,13 @@ void match(Token expected) {
 }
 
 void printError() {
+    if (errorRecovery) {
+        return;
+    }
     std::cout << "Parsing error at " << locToStr(scanner->getLocation()) << ": unexpected token: " << tokenStringMappings[current] << std::endl;
-    current = endfile;
     *error = true;
+    errorRecovery = true;
+    skipToNextStatement();
 }
 
 program_node* parser(Scanner* s, bool* e) {
