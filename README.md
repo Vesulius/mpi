@@ -10,12 +10,15 @@ This is a cource project for University of Helsinki.
 
 ## Instructions
 
-**Compile:** Using g++ compiler:
+The interpreter is compiled using **g++** compiler (version 11.3.0). There are two settings for the compilation: normal and debug mode.
 
+**Default compilation:**
 ``` g++ ./*.cpp -o mpi ```
+This should produce regular executable binary file named **mpi**. 
 
-this sould produce mpi binary file.
+**Debug compilation:**
+``` g++ ./*.cpp -D DEBUG -o mpi ```
+This should produce regular executable binary file named **mpi**.  Debug mode prints additional info about the interpreter such as tokens and abstract syntax tree when run.
 
-**RUN:** 
-
-``` ./mpi YOUR_MP_SOURCE_FILE ```
+**RUN:**  
+``` ./mpi YOUR_MINIPASCAL_SOURCE_FILE ```

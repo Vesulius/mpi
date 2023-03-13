@@ -1,8 +1,4 @@
-Vesa Louhelainen 13.3.2023
-
-Project github: https://github.com/Vesulius/mpi
-
-# Instructions
+# Documentation
 
 The interpreter is compiled using **g++** compiler (version 11.3.0). There are two settings for the compilation: normal and debug mode.
 
@@ -24,13 +20,7 @@ The project is written in c++ using some of the standard library features.
 
 ## Achictecture
 
-The interpreter is made up of three parts: scanner, parser, and runner. Running these is handled by main class.
-
-Scanner reads the source and attempts to find tokens. Scanner is implemented as a class .
-
-Parser requests tokens from scanner and creates abstract syntax tree nodes based on them. Parser is implemented using the visitor pattern, where for each token encountered, specific function is called depending on the context.
-
-Runner accepts abstract syntax tree input and runs it. Runner is also responsible for creation and curation of symbol table and scoping. Runner is implemented using visitor pattern, where each node has their own function. Each node then calls the specific function for all of their children.
+The interpreter is made up of three parts: scanner, parser, and runner. Running these is handled by main class. Scanner is a class that reads the source and attempts to find tokens. Parser requests tokens from scanner and creates abstract syntax tree nodes based on them. The parser is implemented using the visitor pattern, where for each token encountered, specific function is called depending on the context. The runner accepts abstract syntax tree as input and runs it. Runner is also responsible for creation and curation of symbol table and scoping. Runner is implemented using visitor pattern, where each node has their own function. Each node then calls the specific function for all of their children.
 
 There is one additional printVisitor part that is responsible for printing the abstract syntax tree. It is only run for the debugger mode.
 
@@ -40,6 +30,14 @@ There is one additional printVisitor part that is responsible for printing the a
 Language definition follows quite closely to the minipascal language definition.
 
 **Variables** are one of three types: string, int or bool. All variables have value when initialized. Strings are empty string "", ints are 0, bools are true.
+
+**Expressions** variety of expressions exist
+
+```
+var b : bool := !(!true && false); // b = false
+var s : string := "hei" + "ppa!";  // s = "heippa!"
+var i : int := (1 + 1) - 2 * 2;    // i = -2
+```
 
 **Scopes**: The language supports scope up to depth of five. The first scope is "zero" scope and scope is moved one up every time an if- or for statement is encountered. Each scope has their own symbol table. If variable is declared inside a scope, it will be assigned to the current symbol table. If variable is used but not found in the current scope, all scopes below the current scope are searched.
 
@@ -85,7 +83,7 @@ prints:
 ```
 var i : int;
 for i in 0..2 do
-	print i;
+print i;
 end for;
 
 /*
@@ -98,7 +96,7 @@ prints:
 var a : int := -2;
 var i : int;
 for i in a..(a+2) do
-	print i;
+print i;
 end for;
 
 /*
