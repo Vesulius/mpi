@@ -1,8 +1,12 @@
 # Mini pascal interpreter
 
-Interpreter for the (very) simplified language minipascal. 
+Interpreter for the (very) simple pascal-inspired language minipascal. 
 
 This is a cource project for University of Helsinki.
+
+## Documentation
+
+[Documentation for project](https://github.com/Vesulius/mpi/blob/main/README.md)
 
 ## Instructions
 

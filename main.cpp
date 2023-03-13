@@ -7,7 +7,7 @@
 #include "general.h"
 
 int main(int argc, char** argv) {
-    DebugLog("\nRUNNING IN DEBUG MODE:");
+    DebugLog("RUNNING IN DEBUG MODE:\n");
 
     std::string sourceFilePath;
     if (argc > 1) {
@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
     bool error = false;
     Scanner* scanner = new Scanner(sourceFilePath, &error);
 
-    DebugLog("\nPARSING:");
+    DebugLog("PARSING:\n");
     program_node* programNode = parser(scanner, &error);
     delete scanner;
 
