@@ -85,7 +85,7 @@ prints:
 ```
 var i : int;
 for i in 0..2 do
-print i;
+	print i;
 end for;
 
 /*
@@ -98,7 +98,7 @@ prints:
 var a : int := -2;
 var i : int;
 for i in a..(a+2) do
-print i;
+	print i;
 end for;
 
 /*

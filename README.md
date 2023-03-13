@@ -6,7 +6,7 @@ This is a cource project for University of Helsinki.
 
 ## Documentation
 
-[Documentation for project](https://github.com/Vesulius/mpi/blob/main/README.md)
+[Documentation for project](https://github.com/Vesulius/mpi/blob/main/documentation.md)
 
 ## Instructions
 
