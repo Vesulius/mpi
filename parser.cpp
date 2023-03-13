@@ -333,7 +333,7 @@ void match(Token expected) {
         return;
     }
     current = scanner->nextToken();
-    std::cout << "Current token: " << tokenStringMappings[current] << std::endl;
+    DebugLog("Current token: " + tokenStringMappings[current]);
 }
 
 void printError() {
@@ -346,6 +346,6 @@ program_node* parser(Scanner* s, bool* e) {
     scanner = s;
     error = e;
     current = scanner->nextToken();
-    std::cout << "Current token: " << tokenStringMappings[current] << std::endl;
+    DebugLog("Current token: " + tokenStringMappings[current]);
     return program();
 }

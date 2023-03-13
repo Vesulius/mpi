@@ -6,6 +6,12 @@
 #include <variant>
 #include <vector>
 
+#ifdef DEBUG
+#define DebugLog(x) std::cout << x << std::endl
+#else
+#define DebugLog(x)
+#endif
+
 class Scanner {
     std::ifstream sourceFile;
     bool* error;
@@ -34,6 +40,7 @@ static std::string locToStr(std::pair<int, int> pair) {
     std::string s = std::to_string(pair.first) + "," + std::to_string(pair.second);
     return s;
 }
+
 void printVisitor(program_node*);
 void typeVisitor(program_node*);
 void runnerVisitor(program_node*);
