@@ -1,13 +1,17 @@
-# Documentation
+# Instructions
 
 The interpreter is compiled using **g++** compiler (version 11.3.0). There are two settings for the compilation: normal and debug mode.
 
 **Default compilation:**
+
 ``` g++ ./*.cpp -o mpi ```
+
 This should produce regular executable binary file named **mpi**. 
 
 **Debug compilation:**
+
 ``` g++ ./*.cpp -D DEBUG -o mpi ```
+
 This should produce regular executable binary file named **mpi**.  Debug mode prints additional info about the interpreter such as tokens and abstract syntax tree when run.
 
 **RUN:**  
@@ -124,28 +128,39 @@ var i : int := 1 -(-1);  // i = 0
 var i : int := 1 - -1;   // i = 0
 ```
 
-#### Context-free grammar:
+### Context-free grammar:
 
 Items written **bold** are terminals.
 
 program → statemetnt-list **endfile**
+
 statement-list → statement statement-list | **null**
+
 statement→ **id :=** expression **;** | **read** **id** **;** | **write** expression **;** | **declare id declare-type type ;** 
-					 **if** expression **do** statement-list **end if** **;** | **for id in** expression **..** expression **do** statement-list **end for** **;**
+					 **if** expression **do** statement-list **end if** **;** | **for id in** expression **..** expression **do** 
+
+statement-list **end for** **;**
+
 expression → term term-tail | **!** term term-tail
+
 term-tail → add-op term term-tail | **null**
+
 term → factor factor-tail
+
 factor-tail → mult-op factor factor-tail | **null**
+
 factor → **(** expr **)** | **id** | **literal**
+
 add-op → **+** | **-** | **&** | **=** | **<** | **>**
+
 mult-op → **\*** | **/**
 
 
-#### Abstact syntax tree
+### Abstact syntax tree
 
 Abstract syntax tree follows closely from the context-free grammar. All nonterminal symbols are their own nodes that have both the terminals and nonterminals as children. Definition of each node can be seen from node.h file. If running in debug mode the entire AST will be printed to console.
 
-#### Error handling
+### Error handling
 
 The interpreter has several error messages that differ depending on when the error is encountered. Scanner and parser will continue if error is encountered but the runner is only run if no error is found.
 
@@ -156,25 +171,40 @@ The interpreter has several error messages that differ depending on when the err
 **Runner** is responsible of type checking. If error is found a runtimer error is printed and execution is immediately stopped.
 
 
-#### Workhours
+### Workhours
 
 Hard to count accurately as most of this project was learning to use c++ but here is some estimates:
 
 18.2.2022: 1h initilizing project
+
 19.2.2022: 3h basic scanner
+
 19.2.2022: 2h c++ stuff
+
 20.2.2022: 2h parsing
+
 24.2.2022: 3h still parsing
+
 28.2.2022: 5h expressions and printvisitor
+
 2.3.2022: 2h added brackets and some stuff
+
 4.3.2022: 4h added read and print and moved scanner to class
+
 5.3.2022: 2h added simple typechecker
+
 6.3.2022: 1h var declare node
+
 8.3.2022: 3h spitted header to multiple files and first symbol table
+
 9.3.2022: 1h general fixes
+
 10.3.2022: 4h first runner version and read node
+
 11.3.2022: 5h if and fore statements and more operators
+
 12.3.2022: 8h scopes lots of general fixes
+
 13.3.2022: 8h added debug mode and more fixes
 
 Total: 53h
